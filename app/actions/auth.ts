@@ -16,7 +16,8 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    return { error: error.message }
+    // Redirect back to login with error in URL
+    redirect(`/login?error=${encodeURIComponent(error.message)}`)
   }
 
   // Get user role to determine redirect
@@ -38,7 +39,44 @@ export async function login(formData: FormData) {
     }
   }
 
-  return { error: 'Login failed' }
+  redirect('/login?error=Login+failed')
+}
+
+export async function loginAdmin(formData: FormData) {
+  const supabase = await createClient()
+
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect(`/admin/login?error=${encodeURIComponent(error.message)}`)
+  }
+
+  // Verify admin role
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
+      // Not an admin - sign them out and redirect with error
+      await supabase.auth.signOut()
+      redirect('/admin/login?error=Unauthorized%3A+Admin+access+required')
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/admin/dashboard')
+  }
+
+  redirect('/admin/login?error=Login+failed')
 }
 
 export async function signup(formData: FormData) {
@@ -58,7 +96,7 @@ export async function signup(formData: FormData) {
   const { data: authData, error: authError } = await supabase.auth.signUp(data)
 
   if (authError) {
-    return { error: authError.message }
+    redirect(`/register?error=${encodeURIComponent(authError.message)}`)
   }
 
   // Insert into patients table
@@ -77,12 +115,12 @@ export async function signup(formData: FormData) {
       })
 
     if (patientError) {
-      return { error: 'Failed to create patient record: ' + patientError.message }
+      redirect(`/register?error=${encodeURIComponent('Failed to create patient record: ' + patientError.message)}`)
     }
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/dashboard?welcome=true')
 }
 
 export async function logout() {

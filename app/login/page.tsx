@@ -2,7 +2,11 @@
 import Link from 'next/link'
 import { login } from '@/app/actions/auth'
 
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string }
+}) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -34,6 +38,30 @@ export default function LoginPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             Welcome Back
           </h2>
+
+          {/* Error Message */}
+          {searchParams.error && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex gap-3">
+                <svg
+                  className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p className="text-sm text-red-800">
+                  {decodeURIComponent(searchParams.error)}
+                </p>
+              </div>
+            </div>
+          )}
 
           <form action={login} className="space-y-5">
             {/* Email Field */}
