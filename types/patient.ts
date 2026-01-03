@@ -1,4 +1,5 @@
-// types/patient.ts
+// types/patient.ts (UPDATE)
+import type { MedicalHistoryData } from './intake'
 
 export type PatientStatus = 'REGISTERED' | 'SCANNED' | 'PLANNING' | 'PLAN_READY' | 'TREATING'
 
@@ -13,6 +14,8 @@ export interface PatientData {
   admission_date: string
   current_status: PatientStatus
   risk_flags: string[]
+  onboarding_completed: boolean  // NEW
+  medical_history: MedicalHistoryData | null  // NEW
   created_at: string
   updated_at: string
 }

@@ -1,0 +1,41 @@
+{
+    "name": "Parirenyatwa Navigation System",
+    "short_name": "Parirenyatwa Nav",
+    "description": "Patient navigation and treatment tracking for Parirenyatwa Hospital Radiotherapy Center",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "/icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
+    "categories": ["medical", "health"],
+    "shortcuts": [
+      {
+        "name": "My Dashboard",
+        "short_name": "Dashboard",
+        "description": "View your treatment journey",
+        "url": "/dashboard",
+        "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      },
+      {
+        "name": "Sign In",
+        "short_name": "Login",
+        "description": "Sign in to your account",
+        "url": "/login",
+        "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      }
+    ]
+  }
