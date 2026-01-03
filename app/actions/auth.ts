@@ -49,9 +49,13 @@ export async function loginAdmin(formData: FormData) {
     password: formData.get('password') as string,
   }
 
+  console.log('=== ADMIN LOGIN DEBUG ===')
+  console.log('Attempting admin login for:', data.email)
+
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
+    console.error('Auth error:', error)
     redirect(`/admin/login?error=${encodeURIComponent(error.message)}`)
   }
 
@@ -59,17 +63,29 @@ export async function loginAdmin(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (user) {
-    const { data: profile } = await supabase
+    console.log('User authenticated:', user.id)
+    
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
+    if (profileError) {
+      console.error('Profile lookup error:', profileError)
+      await supabase.auth.signOut()
+      redirect(`/admin/login?error=${encodeURIComponent('Database error querying schema')}`)
+    }
+
+    console.log('Profile found:', profile)
+
     if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
+      console.log('User role check failed. Role:', profile?.role)
       await supabase.auth.signOut()
       redirect('/admin/login?error=Unauthorized%3A+Admin+access+required')
     }
 
+    console.log('Admin access granted!')
     revalidatePath('/', 'layout')
     redirect('/admin/dashboard')
   }
