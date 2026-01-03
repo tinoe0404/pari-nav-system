@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx
+// app/dashboard/page.tsx (FIXED - Complete File)
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/actions/auth'
@@ -9,10 +9,8 @@ import type { PatientData, TreatmentPlan } from '@/types/patient'
 export default async function PatientDashboard({
   searchParams,
 }: {
-  // 1. UPDATE: Type is now a Promise
   searchParams: Promise<{ onboarding?: string }>
 }) {
-  // 2. UPDATE: Await the params
   const { onboarding } = await searchParams
 
   const supabase = await createClient()
@@ -34,7 +32,14 @@ export default async function PatientDashboard({
     .eq('user_id', user.id)
     .single()
 
+  // ============================================
+  // CRITICAL FIX: Check for patient existence first
+  // ============================================
   if (patientError || !patient) {
+    console.error('Patient lookup error:', patientError)
+    console.error('User ID:', user?.id)
+    console.error('User email:', user?.email)
+    console.error('Patient lookup error:', patientError)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
@@ -57,8 +62,7 @@ export default async function PatientDashboard({
             Patient Record Not Found
           </h2>
           <p className="text-gray-600 mb-6">
-            We couldn't find your patient record. Please contact the registration
-            desk.
+            We couldn't find your patient record. Please contact the registration desk.
           </p>
           <form action={logout}>
             <button
@@ -76,9 +80,15 @@ export default async function PatientDashboard({
   const typedPatient = patient as PatientData
 
   // ============================================
-  // ONBOARDING GATE: Check if intake completed
+  // ONBOARDING GATE: Check AFTER we confirm patient exists
   // ============================================
+  console.log('Checking onboarding status:', {
+    mrn: typedPatient.mrn,
+    onboarding_completed: typedPatient.onboarding_completed,
+  })
+
   if (!typedPatient.onboarding_completed) {
+    console.log('Redirecting to intake form...')
     redirect('/patient/intake')
   }
 
@@ -147,8 +157,6 @@ export default async function PatientDashboard({
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* 3. UPDATE: Use the awaited variable 'onboarding' here */}
         {onboarding === 'complete' && (
           <div className="mb-8 bg-green-50 border-2 border-green-200 rounded-2xl p-6 animate-fade-in">
             <div className="flex items-start gap-4">
@@ -326,8 +334,7 @@ export default async function PatientDashboard({
                 Need Assistance?
               </h4>
               <p className="text-blue-700 text-sm mb-4">
-                If you have any questions or need help finding your way, our staff
-                is here to help.
+                If you have any questions or need help finding your way, our staff is here to help.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
