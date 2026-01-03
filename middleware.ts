@@ -1,3 +1,4 @@
+// middleware.ts (FIXED - No redirect loop)
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -50,9 +51,10 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // ============================================
-  // PROTECT /admin ROUTES
+  // PROTECT /admin ROUTES (EXCEPT /admin/login)
   // ============================================
-  if (path.startsWith('/admin')) {
+  if (path.startsWith('/admin') && path !== '/admin/login') {
+    // If not logged in, redirect to admin login
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
@@ -67,6 +69,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
+    // If not admin, redirect to home
     if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
