@@ -1,18 +1,21 @@
-// app/admin/login/page.tsx
+// app/login/page.tsx (FIXED)
 import Link from 'next/link'
-import { loginAdmin } from '@/app/actions/auth'
+import { login } from '@/app/actions/auth'
 
-export default function AdminLoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string; redirect?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
+  const error = params.error
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4 ring-4 ring-blue-400/30">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -23,27 +26,24 @@ export default function AdminLoginPage({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Staff Portal
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Parirenyatwa Navigation
           </h1>
-          <p className="text-blue-200">Parirenyatwa Navigation System</p>
+          <p className="text-gray-600">Patient Portal</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Authorized Access Only
-            </h2>
-          </div>
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            Welcome Back
+          </h2>
 
           {/* Error Message */}
-          {searchParams.error && (
+          {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex gap-3">
                 <svg
@@ -60,29 +60,28 @@ export default function AdminLoginPage({
                   />
                 </svg>
                 <p className="text-sm text-red-800">
-                  {decodeURIComponent(searchParams.error)}
+                  {decodeURIComponent(error)}
                 </p>
               </div>
             </div>
           )}
 
-          <form action={loginAdmin} className="space-y-5">
+          <form action={login} className="space-y-5">
             {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Staff Email
+                Email Address
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
-                autoComplete="email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white"
-                placeholder="staff@parirenyatwa.co.zw"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="you@example.com"
               />
             </div>
 
@@ -99,17 +98,29 @@ export default function AdminLoginPage({
                 name="password"
                 type="password"
                 required
-                autoComplete="current-password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 placeholder="••••••••"
               />
             </div>
 
-            {/* Security Notice */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <p className="text-xs text-amber-800">
-                <span className="font-semibold">Security Notice:</span> This portal is for authorized staff only. All access is logged and monitored.
-              </p>
+            {/* Forgot Password Link */}
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="remember" className="ml-2 text-gray-600">
+                  Remember me
+                </label>
+              </div>
+              <Link
+                href="/forgot-password"
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Forgot password?
+              </Link>
             </div>
 
             {/* Submit Button */}
@@ -117,44 +128,38 @@ export default function AdminLoginPage({
               type="submit"
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
             >
-              Sign In to Staff Portal
+              Sign In
             </button>
           </form>
 
-          {/* Help Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Need access?{' '}
-              <Link
-                href="/admin/request-access"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Contact IT Support
-              </Link>
-            </p>
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">
+                New patient?
+              </span>
+            </div>
           </div>
+
+          {/* Register Link */}
+          <Link
+            href="/register"
+            className="block w-full text-center py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+          >
+            Create Account
+          </Link>
         </div>
 
-        {/* Back to Patient Portal */}
+        {/* Staff Login Link */}
         <div className="text-center mt-6">
           <Link
-            href="/login"
-            className="text-sm text-blue-200 hover:text-white flex items-center justify-center gap-2"
+            href="/admin/login"
+            className="text-sm text-gray-600 hover:text-gray-900"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Patient Portal
+            Staff Member? <span className="text-blue-600 font-medium">Login here</span>
           </Link>
         </div>
       </div>

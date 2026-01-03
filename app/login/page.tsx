@@ -1,12 +1,15 @@
-// app/login/page.tsx
+// app/login/page.tsx (FIXED)
 import Link from 'next/link'
 import { login } from '@/app/actions/auth'
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
+  const error = params.error
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -40,7 +43,7 @@ export default function LoginPage({
           </h2>
 
           {/* Error Message */}
-          {searchParams.error && (
+          {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex gap-3">
                 <svg
@@ -57,7 +60,7 @@ export default function LoginPage({
                   />
                 </svg>
                 <p className="text-sm text-red-800">
-                  {decodeURIComponent(searchParams.error)}
+                  {decodeURIComponent(error)}
                 </p>
               </div>
             </div>

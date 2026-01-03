@@ -1,20 +1,27 @@
 // app/patient/intake/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { submitIntakeForm } from '@/app/actions/intake'
 import { useSearchParams } from 'next/navigation'
 
-export default function IntakePage() {
+// We separate the form logic to wrap it in Suspense, 
+// which is required when using useSearchParams in Next.js Client Components
+function IntakeFormContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
-
+  
   const [showAllergyDetails, setShowAllergyDetails] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true)
-    await submitIntakeForm(formData)
+    try {
+      await submitIntakeForm(formData)
+    } catch (e) {
+      // Handle client-side submission errors if necessary
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -454,5 +461,18 @@ export default function IntakePage() {
         </form>
       </main>
     </div>
+  )
+}
+
+// Export the page wrapped in Suspense for Next.js boundary protection
+export default function IntakePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <IntakeFormContent />
+    </Suspense>
   )
 }

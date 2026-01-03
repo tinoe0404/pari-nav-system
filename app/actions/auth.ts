@@ -112,6 +112,8 @@ export async function signup(formData: FormData) {
         full_name: formData.get('full_name') as string,
         dob: formData.get('dob') as string,
         current_status: 'REGISTERED',
+        onboarding_completed: false,  // NEW: Start with onboarding incomplete
+        medical_history: null,        // NEW: No medical history yet
       })
 
     if (patientError) {
@@ -120,7 +122,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard?welcome=true')
+  redirect('/dashboard')  // Will be redirected to /patient/intake by the gate
 }
 
 export async function logout() {

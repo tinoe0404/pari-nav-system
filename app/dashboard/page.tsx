@@ -6,7 +6,15 @@ import Roadmap from '@/components/Roadmap'
 import PatientInfoCard from '@/components/PatientInfoCard'
 import type { PatientData, TreatmentPlan } from '@/types/patient'
 
-export default async function PatientDashboard() {
+export default async function PatientDashboard({
+  searchParams,
+}: {
+  // 1. UPDATE: Type is now a Promise
+  searchParams: Promise<{ onboarding?: string }>
+}) {
+  // 2. UPDATE: Await the params
+  const { onboarding } = await searchParams
+
   const supabase = await createClient()
 
   // Get authenticated user
@@ -65,17 +73,25 @@ export default async function PatientDashboard() {
     )
   }
 
+  const typedPatient = patient as PatientData
+
+  // ============================================
+  // ONBOARDING GATE: Check if intake completed
+  // ============================================
+  if (!typedPatient.onboarding_completed) {
+    redirect('/patient/intake')
+  }
+
   // Fetch treatment plan if exists
   const { data: treatmentPlan } = await supabase
     .from('treatment_plans')
     .select('*')
-    .eq('patient_id', patient.id)
+    .eq('patient_id', typedPatient.id)
     .eq('is_published', true)
     .order('created_at', { ascending: false })
     .limit(1)
     .single()
 
-  const typedPatient = patient as PatientData
   const typedPlan = treatmentPlan as TreatmentPlan | null
 
   return (
@@ -131,6 +147,38 @@ export default async function PatientDashboard() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* 3. UPDATE: Use the awaited variable 'onboarding' here */}
+        {onboarding === 'complete' && (
+          <div className="mb-8 bg-green-50 border-2 border-green-200 rounded-2xl p-6 animate-fade-in">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-green-900 mb-1">
+                  Intake Form Completed!
+                </h3>
+                <p className="text-sm text-green-700">
+                  Thank you for completing your medical intake. Our team has received your information and will use it to provide you with the best possible care.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Message */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -258,7 +306,7 @@ export default async function PatientDashboard() {
         {/* Help Card */}
         <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
