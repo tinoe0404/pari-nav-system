@@ -44,7 +44,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
   const typedPatients = (patients || []) as PatientData[]
 
-  // Helper function to check for high-risk conditions
+  // Helper function to check for HIGH-RISK conditions
   const hasHighRiskCondition = (patient: PatientData): boolean => {
     if (!patient.medical_history) return false
     const conditions = patient.medical_history.conditions
@@ -63,6 +63,9 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     SCANNED: typedPatients.filter(p => p.current_status === 'SCANNED').length,
     PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
   }
+
+  // Count high-risk patients
+  const highRiskCount = typedPatients.filter(hasHighRiskCondition).length
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -111,6 +114,16 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               <p className="text-sm text-gray-600 mt-1">Parirenyatwa Radiotherapy Department</p>
             </div>
             <div className="flex items-center gap-4">
+              {/* High Risk Indicator */}
+              {highRiskCount > 0 && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border-2 border-red-300 rounded-lg">
+                  <svg className="w-5 h-5 text-red-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-bold text-red-900">{highRiskCount} High Risk</span>
+                </div>
+              )}
+              
               <Link
                 href="/admin/settings"
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -136,7 +149,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Success/Error Messages */}
         {success && (
-          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4">
+          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4 animate-fade-in">
             <div className="flex items-center gap-3">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -147,7 +160,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         )}
 
         {error && (
-          <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4">
+          <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 animate-fade-in">
             <div className="flex items-center gap-3">
               <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -163,60 +176,60 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             <nav className="flex -mb-px">
               <Link
                 href="/admin/dashboard"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-colors ${
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
                   activeFilter === 'ALL'
                     ? 'border-purple-600 text-purple-600 bg-purple-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>All Patients</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-purple-100 text-purple-800">
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-purple-100 text-purple-800">
                     {statusCounts.ALL}
                   </span>
                 </div>
               </Link>
               <Link
                 href="/admin/dashboard?status=REGISTERED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-colors ${
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
                   activeFilter === 'REGISTERED'
                     ? 'border-yellow-600 text-yellow-600 bg-yellow-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <span>Intake Pending</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800">
+                  <span>Awaiting Scan</span>
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800">
                     {statusCounts.REGISTERED}
                   </span>
                 </div>
               </Link>
               <Link
                 href="/admin/dashboard?status=SCANNED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-colors ${
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
                   activeFilter === 'SCANNED'
                     ? 'border-blue-600 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Planning Queue</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
                     {statusCounts.SCANNED}
                   </span>
                 </div>
               </Link>
               <Link
                 href="/admin/dashboard?status=PLAN_READY"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-colors ${
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
                   activeFilter === 'PLAN_READY'
                     ? 'border-green-600 text-green-600 bg-green-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Ready for Treatment</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-green-100 text-green-800">
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-green-100 text-green-800">
                     {statusCounts.PLAN_READY}
                   </span>
                 </div>
@@ -228,15 +241,31 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         {/* Patient Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-bold text-gray-900">
-              {activeFilter === 'ALL' && 'All Patients'}
-              {activeFilter === 'REGISTERED' && 'Patients Pending Scan'}
-              {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
-              {activeFilter === 'PLAN_READY' && 'Patients Ready for Treatment'}
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {typedPatients.length === 0 ? 'No patients found' : `${typedPatients.length} patient${typedPatients.length !== 1 ? 's' : ''}`}
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {activeFilter === 'ALL' && 'All Patients'}
+                  {activeFilter === 'REGISTERED' && 'Patients Awaiting Scan'}
+                  {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
+                  {activeFilter === 'PLAN_READY' && 'Patients Ready for Treatment'}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {typedPatients.length === 0 ? 'No patients found' : `${typedPatients.length} patient${typedPatients.length !== 1 ? 's' : ''}`}
+                </p>
+              </div>
+              
+              {/* Quick Stats */}
+              {typedPatients.length > 0 && (
+                <div className="flex items-center gap-4">
+                  {typedPatients.filter(hasHighRiskCondition).length > 0 && (
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">High Risk</p>
+                      <p className="text-lg font-bold text-red-600">{typedPatients.filter(hasHighRiskCondition).length}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {typedPatients.length === 0 ? (
@@ -266,8 +295,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                     <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Risk
+                    <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Risk Level
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                       Action
@@ -275,85 +304,100 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {typedPatients.map((patient) => (
-                    <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-purple-700 font-bold text-sm">
-                              {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                            </span>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-semibold text-gray-900">
-                              {patient.full_name}
+                  {typedPatients.map((patient) => {
+                    const isHighRisk = hasHighRiskCondition(patient)
+                    
+                    return (
+                      <tr 
+                        key={patient.id} 
+                        className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
+                            }`}>
+                              <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
+                                {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                              </span>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
+                            <div className="ml-4">
+                              <div className="text-sm font-semibold text-gray-900">
+                                {patient.full_name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-mono font-bold text-purple-700">
-                          {patient.mrn}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
-                          {new Date(patient.admission_date).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
-                          {getStatusLabel(patient.current_status)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {hasHighRiskCondition(patient) ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-300" title="High Risk Patient">
-                              <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-bold text-red-800">HIGH RISK</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-mono font-bold text-purple-700">
+                            {patient.mrn}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {new Date(patient.admission_date).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
+                            {getStatusLabel(patient.current_status)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            {isHighRisk ? (
+                              <div className="flex flex-col items-center gap-1">
+                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse" title="High Risk Patient">
+                                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <span className="text-xs font-bold text-red-800 uppercase">High</span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center gap-1">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
+                                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                                <span className="text-xs font-medium text-green-800">Standard</span>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
-                              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                            <span className="text-xs font-medium text-green-800">Standard</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <Link
-                          href={`/admin/patient/${patient.id}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-sm hover:shadow-md"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                          </svg>
-                          Manage
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <Link
+                            href={`/admin/patient/${patient.id}`}
+                            className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${
+                              isHighRisk 
+                                ? 'bg-red-600 hover:bg-red-700' 
+                                : 'bg-purple-600 hover:bg-purple-700'
+                            }`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                            </svg>
+                            {isHighRisk ? 'Review (⚠️ Risk)' : 'Manage'}
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
           )}
         </div>
 
-        {/* Stats Cards (Optional Enhancement) */}
+        {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mt-8">
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center justify-between">

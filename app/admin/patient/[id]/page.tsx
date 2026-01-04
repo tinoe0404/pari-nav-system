@@ -60,7 +60,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     })
 
     if (result.success) {
-      redirect(`/admin/patient/${id}?success=Scan logged successfully`)
+      redirect(`/admin/patient/${id}?success=Scan logged successfully. Patient status updated to SCANNED.`)
     } else {
       redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to log scan')}`)
     }
@@ -104,6 +104,14 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     return medicalHistory?.conditions?.[condition] || false
   }
 
+  // Check if ANY high-risk condition exists
+  const isHighRiskPatient = medicalHistory?.conditions && (
+    medicalHistory.conditions.pacemaker ||
+    medicalHistory.conditions.metalImplants ||
+    medicalHistory.conditions.pregnant ||
+    medicalHistory.conditions.claustrophobia
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
@@ -124,9 +132,20 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                 <p className="text-sm text-gray-600">{typedPatient.full_name} • {typedPatient.mrn}</p>
               </div>
             </div>
-            <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border ${getStatusBadgeColor(typedPatient.current_status)}`}>
-              {getStatusLabel(typedPatient.current_status)}
-            </span>
+            <div className="flex items-center gap-3">
+              {/* High Risk Banner */}
+              {isHighRiskPatient && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
+                  <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-bold text-red-900">HIGH RISK PATIENT</span>
+                </div>
+              )}
+              <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border ${getStatusBadgeColor(typedPatient.current_status)}`}>
+                {getStatusLabel(typedPatient.current_status)}
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -135,7 +154,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Success/Error Messages */}
         {success && (
-          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4">
+          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4 animate-fade-in">
             <div className="flex items-center gap-3">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -146,7 +165,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
         )}
 
         {error && (
-          <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4">
+          <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 animate-fade-in">
             <div className="flex items-center gap-3">
               <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -158,7 +177,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
         {/* Two-Column Grid */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* LEFT COLUMN: Patient Context (Read-Only Intake Data) */}
+          {/* LEFT COLUMN: Patient Context (Read-Only Safety Check) */}
           <div className="space-y-6">
             {/* Patient Info Card */}
             <div className="bg-white rounded-xl shadow-md p-6">
@@ -200,80 +219,85 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             </div>
 
-            {/* Medical History Card */}
+            {/* Medical History Card - CRITICAL SAFETY CHECK */}
             {medicalHistory && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Medical History
+                  {isHighRiskPatient && (
+                    <span className="ml-auto text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">REVIEW REQUIRED</span>
+                  )}
                 </h2>
 
-                {/* High-Risk Conditions Warning */}
-                {(hasHighRiskCondition('pacemaker') || 
-                  hasHighRiskCondition('metalImplants') || 
-                  hasHighRiskCondition('pregnant') || 
-                  hasHighRiskCondition('claustrophobia')) && (
-                  <div className="mb-4 bg-red-50 border-2 border-red-300 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="text-sm font-bold text-red-900 mb-1">⚠️ HIGH RISK PATIENT</p>
-                        <p className="text-xs text-red-800">Review conditions carefully before scanning</p>
+                {/* CRITICAL: High-Risk Conditions Warning Banner */}
+                {isHighRiskPatient && (
+                  <div className="mb-5 bg-gradient-to-r from-red-100 to-red-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
+                        <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-base font-bold text-red-900 mb-2">⚠️ HIGH RISK PATIENT - VERIFY BEFORE SCANNING</p>
+                        <p className="text-sm text-red-800 leading-relaxed">
+                          This patient has conditions requiring special protocols. Review all contraindications below and 
+                          consult with supervising radiographer if uncertain about scan safety.
+                        </p>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Conditions List */}
+                {/* Conditions Grid */}
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm font-semibold text-gray-700">Medical Conditions:</p>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Medical Conditions:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {hasHighRiskCondition('pacemaker') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-800 px-3 py-2 rounded-lg border border-red-300">
-                        <span className="font-bold">⚠️</span> Pacemaker
+                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
+                        <span className="text-base">⚠️</span> Pacemaker
                       </div>
                     )}
                     {hasHighRiskCondition('metalImplants') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-800 px-3 py-2 rounded-lg border border-red-300">
-                        <span className="font-bold">⚠️</span> Metal Implants
+                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
+                        <span className="text-base">⚠️</span> Metal Implants
                       </div>
                     )}
                     {hasHighRiskCondition('pregnant') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-800 px-3 py-2 rounded-lg border border-red-300">
-                        <span className="font-bold">⚠️</span> Pregnant
+                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
+                        <span className="text-base">⚠️</span> Pregnant
                       </div>
                     )}
                     {hasHighRiskCondition('claustrophobia') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-800 px-3 py-2 rounded-lg border border-red-300">
-                        <span className="font-bold">⚠️</span> Claustrophobia
+                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
+                        <span className="text-base">⚠️</span> Claustrophobia
                       </div>
                     )}
                     {hasHighRiskCondition('previousRadiation') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg border border-yellow-300">
+                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
                         Previous Radiation
                       </div>
                     )}
                     {hasHighRiskCondition('diabetes') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg border border-yellow-300">
+                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
                         Diabetes
                       </div>
                     )}
                     {hasHighRiskCondition('heartDisease') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg border border-yellow-300">
+                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
                         Heart Disease
                       </div>
                     )}
                     {hasHighRiskCondition('kidneyDisease') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg border border-yellow-300">
+                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
                         Kidney Disease
                       </div>
                     )}
                     {hasHighRiskCondition('allergies') && (
-                      <div className="text-xs bg-orange-100 text-orange-800 px-3 py-2 rounded-lg border border-orange-300">
+                      <div className="text-xs bg-orange-100 text-orange-900 px-3 py-2 rounded-lg border border-orange-300 font-medium">
                         Allergies
                       </div>
                     )}
@@ -282,9 +306,9 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
                 {/* Allergy Details */}
                 {medicalHistory.allergyDetails && (
-                  <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-orange-900 mb-1">Allergy Details:</p>
-                    <p className="text-sm text-orange-800">{medicalHistory.allergyDetails}</p>
+                  <div className="mb-4 bg-orange-50 border-2 border-orange-300 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-orange-900 mb-1">⚠️ Allergy Details:</p>
+                    <p className="text-sm text-orange-900 font-medium">{medicalHistory.allergyDetails}</p>
                   </div>
                 )}
 
@@ -299,7 +323,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                 {/* Mobility Status */}
                 <div className="mb-4">
                   <p className="text-sm font-semibold text-gray-700 mb-2">Mobility Status:</p>
-                  <span className="inline-block text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full border border-blue-300">
+                  <span className="inline-block text-sm bg-blue-100 text-blue-900 px-4 py-2 rounded-full border border-blue-300 font-semibold">
                     {medicalHistory.mobilityStatus === 'walking' && '🚶 Walking Independently'}
                     {medicalHistory.mobilityStatus === 'assistance_needed' && '🦯 Walking with Assistance'}
                     {medicalHistory.mobilityStatus === 'wheelchair' && '♿ Wheelchair'}
@@ -308,7 +332,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                 </div>
 
                 {/* Next of Kin */}
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                   <p className="text-sm font-semibold text-purple-900 mb-2">Emergency Contact:</p>
                   <div className="space-y-1 text-sm text-purple-800">
                     <p><span className="font-medium">Name:</span> {medicalHistory.nextOfKin.name}</p>
@@ -332,13 +356,27 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
           <div className="space-y-6">
             {/* REGISTERED Status: Show Scan Form */}
             {typedPatient.current_status === 'REGISTERED' && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                   </svg>
                   Log Scan Results
                 </h2>
+
+                {/* Safety Confirmation */}
+                {isHighRiskPatient && (
+                  <div className="mb-5 bg-amber-50 border-2 border-amber-400 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <p className="text-sm text-amber-900 font-medium">
+                        Confirm you have reviewed all high-risk conditions and verified patient eligibility for scanning.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <form action={handleScanSubmit} className="space-y-4">
                   <div>
@@ -352,6 +390,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                       placeholder="e.g., CT Room 1, Scanner A"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Specify the exact scanning equipment used</p>
                   </div>
 
                   <div>
@@ -361,29 +400,33 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     <textarea
                       name="notes"
                       required
-                      rows={6}
-                      placeholder="Document scan details, patient cooperation, any issues encountered..."
+                      rows={7}
+                      placeholder="Document scan details, patient cooperation, any issues encountered, contrast used, positioning notes..."
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      These notes are confidential and only visible to clinical staff.
+                      Minimum 10 characters. These notes are confidential and only visible to clinical staff.
                     </p>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className={`w-full py-4 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${
+                      isHighRiskPatient 
+                        ? 'bg-red-600 hover:bg-red-700' 
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Complete Scan & Update Status
+                    {isHighRiskPatient ? 'Confirm High-Risk Scan Complete' : 'Complete Scan & Update Status'}
                   </button>
                 </form>
               </div>
             )}
 
-            {/* SCANNED Status: Show Scan Complete Badge */}
+            {/* SCANNED Status: Show Planning CTA */}
             {typedPatient.current_status === 'SCANNED' && (
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-center py-8">
@@ -394,7 +437,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Scan Complete</h3>
                   <p className="text-sm text-gray-600 mb-6">
-                    Patient scan has been logged. Proceed to treatment planning.
+                    Patient scan has been logged successfully. Proceed to treatment planning.
                   </p>
                   <Link
                     href={`/admin/patient/${id}/plan`}
@@ -409,7 +452,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             )}
 
-            {/* Scan Logs History (if any) */}
+            {/* Scan Logs History */}
             {scanLogs && scanLogs.length > 0 && (
               <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -420,18 +463,20 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                 </h2>
                 <div className="space-y-3">
                   {scanLogs.map((log: any) => (
-                    <div key={log.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div key={log.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors">
                       <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs font-semibold text-purple-700">{log.machine_room}</span>
+                        <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded">{log.machine_room}</span>
                         <span className="text-xs text-gray-500">
                           {new Date(log.scan_date).toLocaleDateString('en-GB', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
                           })}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700">{log.scan_notes}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{log.scan_notes}</p>
                     </div>
                   ))}
                 </div>
