@@ -41,6 +41,7 @@ export async function login(formData: FormData) {
   redirect('/login?error=Login+failed')
 }
 
+// app/actions/auth.ts - TEMPORARY DEBUG VERSION
 export async function loginAdmin(formData: FormData) {
   const supabase = await createClient()
 
@@ -52,45 +53,67 @@ export async function loginAdmin(formData: FormData) {
   console.log('=== ADMIN LOGIN DEBUG ===')
   console.log('Attempting admin login for:', data.email)
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  try {
+    // Try to sign in
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data)
 
-  if (error) {
-    console.error('Auth error:', error)
-    redirect(`/admin/login?error=${encodeURIComponent(error.message)}`)
-  }
+    if (authError) {
+      console.error('Auth error details:', {
+        message: authError.message,
+        status: authError.status,
+        code: authError.code,
+      })
+      redirect(`/admin/login?error=${encodeURIComponent(authError.message)}`)
+    }
 
-  // Verify admin role
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (user) {
-    console.log('User authenticated:', user.id)
+    if (!authData.user) {
+      redirect('/admin/login?error=No+user+returned')
+    }
+
+    console.log('User authenticated:', authData.user.id)
+
+    // Use service role to check profile (bypasses RLS completely)
+    const supabaseAdmin = await createClient()
     
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    // Try with the service role key if available
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const { createClient: createServiceClient } = await import('@supabase/supabase-js')
+      const adminClient = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
 
-    if (profileError) {
-      console.error('Profile lookup error:', profileError)
-      await supabase.auth.signOut()
-      redirect(`/admin/login?error=${encodeURIComponent('Database error querying schema')}`)
+      const { data: profile, error: profileError } = await adminClient
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (profileError) {
+        console.error('Profile lookup error:', profileError)
+        await supabase.auth.signOut()
+        redirect(`/admin/login?error=${encodeURIComponent('Profile lookup failed: ' + profileError.message)}`)
+      }
+
+      console.log('Profile found:', profile)
+
+      if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
+        console.log('User role check failed. Role:', profile?.role)
+        await supabase.auth.signOut()
+        redirect('/admin/login?error=Unauthorized%3A+Admin+access+required')
+      }
+
+      console.log('Admin access granted!')
+      revalidatePath('/', 'layout')
+      redirect('/admin/dashboard')
+    } else {
+      console.error('SUPABASE_SERVICE_ROLE_KEY not found')
+      redirect('/admin/login?error=Server+configuration+error')
     }
-
-    console.log('Profile found:', profile)
-
-    if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
-      console.log('User role check failed. Role:', profile?.role)
-      await supabase.auth.signOut()
-      redirect('/admin/login?error=Unauthorized%3A+Admin+access+required')
-    }
-
-    console.log('Admin access granted!')
-    revalidatePath('/', 'layout')
-    redirect('/admin/dashboard')
+  } catch (error) {
+    console.error('Unexpected error during admin login:', error)
+    redirect('/admin/login?error=Unexpected+error')
   }
-
-  redirect('/admin/login?error=Login+failed')
 }
 
 export async function signup(formData: FormData) {
