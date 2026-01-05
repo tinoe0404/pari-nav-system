@@ -1,10 +1,12 @@
-// app/admin/dashboard/page.tsx
+// app/admin/dashboard/page.tsx (FIXED)
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
+import { logout } from '@/app/actions/auth'
 import type { PatientData } from '@/types/patient'
-import type { MedicalHistoryData } from '@/types/intake'
+
+export const dynamic = 'force-dynamic'
 
 interface PageProps {
   searchParams: Promise<{ 
@@ -15,14 +17,18 @@ interface PageProps {
 }
 
 export default async function AdminDashboardPage({ searchParams }: PageProps) {
+  // ============================================
+  // FIX: Await searchParams (Next.js 15+)
+  // ============================================
+  const params = await searchParams
+  const { status: statusFilter, success, error } = params
+
   // Verify admin access
   try {
     await requireAdmin()
   } catch (error) {
     redirect('/admin/login?error=Unauthorized')
   }
-
-  const { status: statusFilter, success, error } = await searchParams
 
   const supabase = await createClient()
 
@@ -39,7 +45,12 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   const { data: patients, error: fetchError } = await query
 
   if (fetchError) {
-    console.error('Error fetching patients:', fetchError)
+    console.error('Error fetching patients:', {
+      message: fetchError.message,
+      details: fetchError.details,
+      hint: fetchError.hint,
+      code: fetchError.code
+    })
   }
 
   const typedPatients = (patients || []) as PatientData[]
@@ -56,7 +67,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     )
   }
 
-  // Count patients by status for tab badges
+  // Count patients by status
   const statusCounts = {
     ALL: typedPatients.length,
     REGISTERED: typedPatients.filter(p => p.current_status === 'REGISTERED').length,
@@ -64,7 +75,6 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
   }
 
-  // Count high-risk patients
   const highRiskCount = typedPatients.filter(hasHighRiskCondition).length
 
   const getStatusBadgeColor = (status: string) => {
@@ -114,7 +124,6 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               <p className="text-sm text-gray-600 mt-1">Parirenyatwa Radiotherapy Department</p>
             </div>
             <div className="flex items-center gap-4">
-              {/* High Risk Indicator */}
               {highRiskCount > 0 && (
                 <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border-2 border-red-300 rounded-lg">
                   <svg className="w-5 h-5 text-red-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
@@ -124,22 +133,17 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 </div>
               )}
               
-              <Link
-                href="/admin/settings"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Settings"
-              >
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </Link>
-              <Link
-                href="/api/auth/signout"
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Sign Out
-              </Link>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign Out
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -254,15 +258,12 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 </p>
               </div>
               
-              {/* Quick Stats */}
-              {typedPatients.length > 0 && (
+              {typedPatients.length > 0 && typedPatients.filter(hasHighRiskCondition).length > 0 && (
                 <div className="flex items-center gap-4">
-                  {typedPatients.filter(hasHighRiskCondition).length > 0 && (
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">High Risk</p>
-                      <p className="text-lg font-bold text-red-600">{typedPatients.filter(hasHighRiskCondition).length}</p>
-                    </div>
-                  )}
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">High Risk</p>
+                    <p className="text-lg font-bold text-red-600">{typedPatients.filter(hasHighRiskCondition).length}</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -354,7 +355,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                           <div className="flex items-center justify-center">
                             {isHighRisk ? (
                               <div className="flex flex-col items-center gap-1">
-                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse" title="High Risk Patient">
+                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse">
                                   <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                   </svg>

@@ -46,6 +46,14 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     .eq('patient_id', id)
     .order('scan_date', { ascending: false })
 
+  // Fetch published treatment plan (if exists)
+  const { data: treatmentPlan } = await supabase
+    .from('treatment_plans')
+    .select('*')
+    .eq('patient_id', id)
+    .eq('is_published', true)
+    .single()
+
   // Server Action for scan form submission
   async function handleScanSubmit(formData: FormData) {
     'use server'
@@ -177,7 +185,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
         {/* Two-Column Grid */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* LEFT COLUMN: Patient Context (Read-Only Safety Check) */}
+          {/* LEFT COLUMN: Patient Context */}
           <div className="space-y-6">
             {/* Patient Info Card */}
             <div className="bg-white rounded-xl shadow-md p-6">
@@ -219,7 +227,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             </div>
 
-            {/* Medical History Card - CRITICAL SAFETY CHECK */}
+            {/* Medical History Card */}
             {medicalHistory && (
               <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -232,7 +240,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   )}
                 </h2>
 
-                {/* CRITICAL: High-Risk Conditions Warning Banner */}
+                {/* High-Risk Warning Banner */}
                 {isHighRiskPatient && (
                   <div className="mb-5 bg-gradient-to-r from-red-100 to-red-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
                     <div className="flex items-start gap-4">
@@ -242,10 +250,9 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-base font-bold text-red-900 mb-2">⚠️ HIGH RISK PATIENT - VERIFY BEFORE SCANNING</p>
+                        <p className="text-base font-bold text-red-900 mb-2">⚠️ HIGH RISK PATIENT</p>
                         <p className="text-sm text-red-800 leading-relaxed">
-                          This patient has conditions requiring special protocols. Review all contraindications below and 
-                          consult with supervising radiographer if uncertain about scan safety.
+                          This patient has conditions requiring special protocols. Review all contraindications carefully.
                         </p>
                       </div>
                     </div>
@@ -352,9 +359,9 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
             )}
           </div>
 
-          {/* RIGHT COLUMN: Actions */}
+          {/* RIGHT COLUMN: Actions & Treatment Plan */}
           <div className="space-y-6">
-            {/* REGISTERED Status: Show Scan Form */}
+            {/* REGISTERED: Scan Form */}
             {typedPatient.current_status === 'REGISTERED' && (
               <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -364,7 +371,6 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   Log Scan Results
                 </h2>
 
-                {/* Safety Confirmation */}
                 {isHighRiskPatient && (
                   <div className="mb-5 bg-amber-50 border-2 border-amber-400 rounded-lg p-4">
                     <div className="flex items-start gap-3">
@@ -405,7 +411,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Minimum 10 characters. These notes are confidential and only visible to clinical staff.
+                      Minimum 10 characters. These notes are confidential.
                     </p>
                   </div>
 
@@ -426,7 +432,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             )}
 
-            {/* SCANNED Status: Show Planning CTA */}
+            {/* SCANNED: Planning CTA */}
             {typedPatient.current_status === 'SCANNED' && (
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-center py-8">
@@ -448,6 +454,114 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     </svg>
                     Proceed to Treatment Planning
                   </Link>
+                </div>
+              </div>
+            )}
+
+            {/* PLAN_READY/TREATING: Show Published Plan */}
+            {(typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATING') && treatmentPlan && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Published Treatment Plan
+                  </h2>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-300">
+                    PUBLISHED
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Treatment Type */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1">Treatment Type</p>
+                    <p className="text-lg font-bold text-purple-900">{treatmentPlan.treatment_type}</p>
+                  </div>
+
+                  {/* Sessions & Schedule */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Sessions</p>
+                      <p className="text-2xl font-bold text-blue-900">{treatmentPlan.num_sessions}</p>
+                    </div>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-1">Start Date</p>
+                      <p className="text-sm font-bold text-orange-900">
+                        {new Date(treatmentPlan.start_date).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </p>
+                      <p className="text-xs text-orange-700 mt-1">
+                        {new Date(treatmentPlan.start_date).toLocaleTimeString('en-GB', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Prep Instructions */}
+                  {treatmentPlan.prep_instructions && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">Preparation Instructions</p>
+                      <p className="text-sm text-amber-900">{treatmentPlan.prep_instructions}</p>
+                    </div>
+                  )}
+
+                  {/* Side Effects */}
+                  {treatmentPlan.side_effects && treatmentPlan.side_effects.length > 0 && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-2">Monitored Side Effects</p>
+                      <div className="flex flex-wrap gap-2">
+                        {treatmentPlan.side_effects.map((effect: string) => (
+                          <span key={effect} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-300">
+                            {effect}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Plan Metadata */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Plan Details</p>
+                    <div className="space-y-1 text-xs text-gray-700">
+                      <p><span className="font-medium">Published:</span> {new Date(treatmentPlan.created_at).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</p>
+                      <p><span className="font-medium">Last Updated:</span> {new Date(treatmentPlan.updated_at).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</p>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-600 mb-3">
+                      This plan is now visible to the patient in their dashboard. They have been notified of their treatment schedule.
+                    </p>
+                    <Link
+                      href="/admin/dashboard"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Back to Dashboard
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}

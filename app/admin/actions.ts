@@ -4,6 +4,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
+import { sendPlanReadyEmail, type EmailNotificationResult } from '@/lib/email'
 
 // ============================================
 // TYPE DEFINITIONS
@@ -28,10 +29,11 @@ export interface ActionResponse<T = void> {
   success: boolean
   data?: T
   error?: string
+  warning?: string  // For non-critical issues like email failures
 }
 
 // ============================================
-// 1. LOG PATIENT SCAN (ENHANCED)
+// 1. LOG PATIENT SCAN (UNCHANGED)
 // ============================================
 
 export async function logPatientScan(
@@ -160,12 +162,12 @@ export async function logPatientScan(
 }
 
 // ============================================
-// 2. PUBLISH TREATMENT PLAN (ENHANCED)
+// 2. PUBLISH TREATMENT PLAN (WITH EMAIL NOTIFICATION)
 // ============================================
 
 export async function publishTreatmentPlan(
   input: TreatmentPlanInput
-): Promise<ActionResponse<{ planId: string }>> {
+): Promise<ActionResponse<{ planId: string; emailNotification: EmailNotificationResult }>> {
   try {
     // Verify admin access
     const admin = await requireAdmin()
@@ -232,7 +234,7 @@ export async function publishTreatmentPlan(
     // Step 1: Verify patient exists and is in correct status
     const { data: patient, error: patientCheckError } = await supabase
       .from('patients')
-      .select('id, mrn, full_name, current_status')
+      .select('id, mrn, full_name, current_status, user_id')
       .eq('id', patientId)
       .single()
 
@@ -313,16 +315,66 @@ export async function publishTreatmentPlan(
       }
     }
 
-    // Step 5: Revalidate all relevant pages (admin + patient)
+    // Step 5: Get patient's email address for notification
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('email')
+      .eq('id', patient.user_id)
+      .single()
+
+    let emailNotification: EmailNotificationResult = {
+      emailSent: false,
+      emailError: 'Email address not found'
+    }
+
+    // Step 6: Send email notification (non-blocking with error handling)
+    if (userError || !userData?.email) {
+      console.warn(`⚠️  Could not find email for patient ${patient.mrn}:`, userError?.message)
+      emailNotification.emailError = 'Patient email address not found in system'
+    } else {
+      try {
+        console.log(`📧 Sending plan ready email to ${userData.email}...`)
+        emailNotification = await sendPlanReadyEmail(userData.email, patient.full_name)
+        
+        if (emailNotification.emailSent) {
+          console.log(`✅ Email successfully sent to ${userData.email}`)
+        } else {
+          console.error(`❌ Failed to send email to ${userData.email}:`, emailNotification.emailError)
+        }
+      } catch (emailError) {
+        // Catch any unexpected errors from email sending
+        console.error('❌ Unexpected error during email sending:', emailError)
+        emailNotification = {
+          emailSent: false,
+          emailError: emailError instanceof Error 
+            ? emailError.message 
+            : 'Unexpected email service error'
+        }
+      }
+    }
+
+    // Step 7: Revalidate all relevant pages (admin + patient)
     revalidatePath('/admin')
     revalidatePath('/admin/dashboard')
     revalidatePath(`/admin/patient/${patientId}`)
     revalidatePath('/dashboard') // Patient dashboard
 
-    return {
+    // Return success with email status
+    const response: ActionResponse<{ planId: string; emailNotification: EmailNotificationResult }> = {
       success: true,
-      data: { planId: plan.id },
+      data: { 
+        planId: plan.id,
+        emailNotification 
+      },
     }
+
+    // Add warning if email failed but plan published successfully
+    if (!emailNotification.emailSent) {
+      response.warning = `Treatment plan published successfully, but email notification failed: ${emailNotification.emailError}. Please inform the patient manually.`
+    }
+
+    return response
+
   } catch (error) {
     console.error('publishTreatmentPlan error:', error)
     return {
@@ -333,7 +385,7 @@ export async function publishTreatmentPlan(
 }
 
 // ============================================
-// 3. GET PATIENT SCAN LOGS (HELPER)
+// 3. GET PATIENT SCAN LOGS (HELPER - UNCHANGED)
 // ============================================
 
 export async function getPatientScanLogs(patientId: string) {
@@ -375,7 +427,7 @@ export async function getPatientScanLogs(patientId: string) {
 }
 
 // ============================================
-// 4. GET PATIENT TREATMENT PLANS (HELPER)
+// 4. GET PATIENT TREATMENT PLANS (HELPER - UNCHANGED)
 // ============================================
 
 export async function getPatientTreatmentPlans(patientId: string) {

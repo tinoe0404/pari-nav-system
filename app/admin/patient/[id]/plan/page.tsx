@@ -16,6 +16,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
   const [patientId, setPatientId] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [warning, setWarning] = useState<string | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   // Form state
@@ -81,6 +82,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
+    setWarning(null)
 
     // Validate form
     if (!validateForm()) {
@@ -108,8 +110,17 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
       const result = await publishTreatmentPlan(input)
 
       if (result.success) {
-        // Redirect to admin dashboard with success message
-        router.push('/admin/dashboard?success=Treatment plan published successfully. Patient has been notified.')
+        // Check if email notification succeeded
+        const emailStatus = result.data?.emailNotification
+        
+        if (emailStatus?.emailSent) {
+          // Full success - plan published AND email sent
+          router.push('/admin/dashboard?success=Treatment plan published successfully. Patient has been notified via email.')
+        } else {
+          // Partial success - plan published but email failed
+          const warningMsg = result.warning || 'Treatment plan published, but email notification failed. Please inform patient manually.'
+          router.push(`/admin/dashboard?warning=${encodeURIComponent(warningMsg)}`)
+        }
       } else {
         setError(result.error || 'Failed to publish treatment plan')
         setIsSubmitting(false)
@@ -180,8 +191,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
               </h3>
               <p className="text-sm text-blue-700 leading-relaxed">
                 This treatment plan will be immediately visible to the patient once published. 
-                Please verify all details carefully before submission. The patient will receive 
-                automatic notification with their schedule.
+                The patient will receive an <strong>automatic email notification</strong> with their schedule.
+                Please verify all details carefully before submission.
               </p>
             </div>
           </div>
@@ -199,7 +210,19 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Planning Form */}
+        {/* Warning Message */}
+        {warning && (
+          <div className="mb-6 bg-amber-50 border-2 border-amber-300 rounded-xl p-4 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm font-semibold text-amber-900">{warning}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Planning Form - SAME AS BEFORE */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Treatment Details */}
           <div className="bg-white rounded-xl shadow-md p-6">
