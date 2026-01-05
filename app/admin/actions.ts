@@ -42,22 +42,22 @@ export async function logPatientScan(
   try {
     // Verify admin access
     const admin = await requireAdmin()
-    
+
     const { patientId, machineRoom, notes } = input
 
     // Enhanced validation with specific error messages
     if (!patientId?.trim()) {
       return { success: false, error: 'Patient ID is required' }
     }
-    
+
     if (!machineRoom?.trim()) {
       return { success: false, error: 'Machine room identifier is required' }
     }
-    
+
     if (!notes?.trim() || notes.trim().length < 10) {
-      return { 
-        success: false, 
-        error: 'Scan notes must be at least 10 characters and describe the procedure' 
+      return {
+        success: false,
+        error: 'Scan notes must be at least 10 characters and describe the procedure'
       }
     }
 
@@ -74,15 +74,15 @@ export async function logPatientScan(
       return { success: false, error: 'Patient not found in system' }
     }
 
-    // Safety Check: Verify patient status
-    if (patient.current_status !== 'REGISTERED') {
+    // Safety Check: Verify patient status - Allow REGISTERED (legacy) or CONSULTATION_COMPLETED (new flow)
+    if (patient.current_status !== 'REGISTERED' && patient.current_status !== 'CONSULTATION_COMPLETED') {
       const statusMap: Record<string, string> = {
         'SCANNED': 'already scanned',
         'PLANNING': 'in planning phase',
         'PLAN_READY': 'awaiting treatment',
         'TREATING': 'currently in treatment'
       }
-      
+
       const statusDesc = statusMap[patient.current_status] || patient.current_status.toLowerCase()
       return {
         success: false,
@@ -98,7 +98,7 @@ export async function logPatientScan(
       if (medHistory.conditions.metalImplants) highRisk.push('metal implants')
       if (medHistory.conditions.pregnant) highRisk.push('pregnancy')
       if (medHistory.conditions.claustrophobia) highRisk.push('claustrophobia')
-      
+
       if (highRisk.length > 0) {
         console.warn(`⚠️  HIGH RISK SCAN: Patient ${patient.mrn} has ${highRisk.join(', ')}`)
       }
@@ -249,7 +249,7 @@ export async function publishTreatmentPlan(
         'PLAN_READY': 'already has a published plan',
         'TREATING': 'is currently in active treatment'
       }
-      
+
       const statusDesc = statusMap[patient.current_status] || `in ${patient.current_status} status`
       return {
         success: false,
@@ -315,12 +315,10 @@ export async function publishTreatmentPlan(
       }
     }
 
-    // Step 5: Get patient's email address for notification
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('email')
-      .eq('id', patient.user_id)
-      .single()
+    // Step 5: Get patient's email address for notification using Supabase Auth
+    const { data: authData, error: userError } = await supabase.auth.admin.getUserById(
+      patient.user_id
+    )
 
     let emailNotification: EmailNotificationResult = {
       emailSent: false,
@@ -328,26 +326,26 @@ export async function publishTreatmentPlan(
     }
 
     // Step 6: Send email notification (non-blocking with error handling)
-    if (userError || !userData?.email) {
+    if (userError || !authData?.user?.email) {
       console.warn(`⚠️  Could not find email for patient ${patient.mrn}:`, userError?.message)
       emailNotification.emailError = 'Patient email address not found in system'
     } else {
       try {
-        console.log(`📧 Sending plan ready email to ${userData.email}...`)
-        emailNotification = await sendPlanReadyEmail(userData.email, patient.full_name)
-        
+        console.log(`📧 Sending plan ready email to ${authData.user.email}...`)
+        emailNotification = await sendPlanReadyEmail(authData.user.email, patient.full_name)
+
         if (emailNotification.emailSent) {
-          console.log(`✅ Email successfully sent to ${userData.email}`)
+          console.log(`✅ Email successfully sent to ${authData.user.email}`)
         } else {
-          console.error(`❌ Failed to send email to ${userData.email}:`, emailNotification.emailError)
+          console.error(`❌ Failed to send email to ${authData.user.email}:`, emailNotification.emailError)
         }
       } catch (emailError) {
         // Catch any unexpected errors from email sending
         console.error('❌ Unexpected error during email sending:', emailError)
         emailNotification = {
           emailSent: false,
-          emailError: emailError instanceof Error 
-            ? emailError.message 
+          emailError: emailError instanceof Error
+            ? emailError.message
             : 'Unexpected email service error'
         }
       }
@@ -362,9 +360,9 @@ export async function publishTreatmentPlan(
     // Return success with email status
     const response: ActionResponse<{ planId: string; emailNotification: EmailNotificationResult }> = {
       success: true,
-      data: { 
+      data: {
         planId: plan.id,
-        emailNotification 
+        emailNotification
       },
     }
 

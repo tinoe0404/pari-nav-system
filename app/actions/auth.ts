@@ -26,7 +26,7 @@ export async function login(formData: FormData) {
 
   // Refresh the session to ensure cookies are set
   const { data: { user }, error: getUserError } = await supabase.auth.getUser()
-  
+
   if (getUserError || !user) {
     console.error('Failed to get user after login:', getUserError)
     redirect('/login?error=Session+establishment+failed')
@@ -40,7 +40,7 @@ export async function login(formData: FormData) {
     .single()
 
   revalidatePath('/', 'layout')
-  
+
   if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') {
     redirect('/admin/dashboard')
   } else {
@@ -81,7 +81,7 @@ export async function loginAdmin(formData: FormData) {
 
     // Use service role to check profile (bypasses RLS completely)
     const supabaseAdmin = await createClient()
-    
+
     // Try with the service role key if available
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const { createClient: createServiceClient } = await import('@supabase/supabase-js')
@@ -117,7 +117,8 @@ export async function loginAdmin(formData: FormData) {
       console.error('SUPABASE_SERVICE_ROLE_KEY not found')
       redirect('/admin/login?error=Server+configuration+error')
     }
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) throw error
     console.error('Unexpected error during admin login:', error)
     redirect('/admin/login?error=Unexpected+error')
   }
@@ -163,7 +164,7 @@ export async function signup(formData: FormData) {
 
   // Step 3: Generate MRN with retry logic for duplicates
   console.log('Generating MRN...')
-  
+
   // Use service role key to bypass RLS for patient creation
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error('SUPABASE_SERVICE_ROLE_KEY not found')
@@ -180,12 +181,12 @@ export async function signup(formData: FormData) {
   let mrnData: string | null = null
   let mrnError: any = null
   const maxRetries = 5
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     console.log(`MRN generation attempt ${attempt}/${maxRetries}...`)
-    
-    const { data: generatedMrn, error: genError } = await supabase.rpc('generate_mrn')
-    
+
+    const { data: generatedMrn, error: genError } = await adminClient.rpc('generate_mrn')
+
     if (genError) {
       console.error(`MRN generation error (attempt ${attempt}):`, genError)
       mrnError = genError
@@ -218,7 +219,7 @@ export async function signup(formData: FormData) {
 
   // Step 4: Create patient record using service role to bypass RLS
   console.log('Creating patient record with MRN:', mrnData)
-  
+
   const { data: patientData, error: patientError } = await adminClient
     .from('patients')
     .insert({
@@ -242,7 +243,7 @@ export async function signup(formData: FormData) {
       full_name: fullName,
       dob: dob,
     })
-    
+
     // If it's still a duplicate error, something went wrong with our check
     if (patientError.code === '23505') {
       redirect(`/register?error=${encodeURIComponent('Patient ID conflict. Please try registering again.')}`)

@@ -41,7 +41,7 @@ export default async function PatientDashboard({
   if (patientError || !patient) {
     // PGRST116 is expected when no patient record exists (not a real error)
     const isNoRecordError = patientError?.code === 'PGRST116'
-    
+
     if (!isNoRecordError && patientError) {
       // Only log actual errors, not "no record found" cases
       console.error('Patient lookup error:', {
@@ -53,7 +53,7 @@ export default async function PatientDashboard({
       console.error('User ID:', user?.id)
       console.error('User email:', user?.email)
     }
-    
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
@@ -76,7 +76,7 @@ export default async function PatientDashboard({
             Patient Record Not Found
           </h2>
           <p className="text-gray-600 mb-6">
-            We couldn't find your patient record. This may happen if you haven't completed registration yet. 
+            We couldn't find your patient record. This may happen if you haven't completed registration yet.
             Please contact the registration desk or try registering again.
           </p>
           <div className="flex flex-col gap-3">
@@ -106,7 +106,7 @@ export default async function PatientDashboard({
   // THE GATE: Blocking redirect if medical_history is empty/null
   // ============================================
   // Check medical_history directly (the source of truth)
-  const hasMedicalHistory = typedPatient.medical_history && 
+  const hasMedicalHistory = typedPatient.medical_history &&
     Object.keys(typedPatient.medical_history).length > 0
 
   if (!hasMedicalHistory) {
@@ -227,22 +227,27 @@ export default async function PatientDashboard({
         {/* ============================================ */}
         {/* STATE-BASED HERO CARDS */}
         {/* ============================================ */}
-        {typedPatient.current_status === 'REGISTERED' && (
+        {/* Show consultation hero card for INTAKE_COMPLETED status */}
+        {typedPatient.current_status === 'INTAKE_COMPLETED' && (
           <Phase1HeroCard
             consultantRoom={typedPatient.consultant_name ? 'Room 104' : 'Room 104'}
           />
         )}
 
-        {typedPatient.current_status === 'SCANNED' && (
-          <Phase2HeroCard />
-        )}
+        {/* Show planning hero card when scanned or consultation completed */}
+        {(typedPatient.current_status === 'SCANNED' ||
+          typedPatient.current_status === 'CONSULTATION_COMPLETED') && (
+            <Phase2HeroCard />
+          )}
 
-        {/* Treatment Journey Section - Show for all statuses but less prominent for REGISTERED/SCANNED */}
-        <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${
-          typedPatient.current_status === 'REGISTERED' || typedPatient.current_status === 'SCANNED'
+        {/* Treatment Journey Section - Show for all statuses but less prominent for early stages */}
+        <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${typedPatient.current_status === 'REGISTERED' ||
+            typedPatient.current_status === 'INTAKE_COMPLETED' ||
+            typedPatient.current_status === 'CONSULTATION_COMPLETED' ||
+            typedPatient.current_status === 'SCANNED'
             ? 'opacity-75'
             : ''
-        }`}>
+          }`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg
@@ -273,95 +278,95 @@ export default async function PatientDashboard({
         {/* ============================================ */}
         {/* PHASE 3: THE TICKET (PLAN_READY/TREATING) */}
         {/* ============================================ */}
-        {typedPlan && 
-         (typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATING') && (
-          <TreatmentTicket 
-            plan={typedPlan} 
-            patientName={typedPatient.full_name}
-          />
-        )}
+        {typedPlan &&
+          (typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATING') && (
+            <TreatmentTicket
+              plan={typedPlan}
+              patientName={typedPatient.full_name}
+            />
+          )}
 
         {/* Legacy Treatment Plan Card - Show only if not PLAN_READY/TREATING */}
-        {typedPlan && 
-         typedPatient.current_status !== 'PLAN_READY' && 
-         typedPatient.current_status !== 'TREATING' && (
-          <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-7 h-7 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">Your Treatment Plan</h3>
-                <p className="text-purple-200 text-sm">Ready to begin</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <p className="text-purple-200 text-sm mb-1">Treatment Type</p>
-                <p className="text-xl font-bold">{typedPlan.treatment_type}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-purple-200 text-sm mb-1">Sessions</p>
-                  <p className="text-2xl font-bold">{typedPlan.num_sessions}</p>
+        {typedPlan &&
+          typedPatient.current_status !== 'PLAN_READY' &&
+          typedPatient.current_status !== 'TREATING' && (
+            <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <svg
+                    className="w-7 h-7 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-purple-200 text-sm mb-1">Start Date</p>
-                  <p className="text-lg font-bold">
-                    {new Date(typedPlan.start_date).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
+                <div>
+                  <h3 className="text-2xl font-bold">Your Treatment Plan</h3>
+                  <p className="text-purple-200 text-sm">Ready to begin</p>
                 </div>
               </div>
 
-              {typedPlan.prep_instructions && (
+              <div className="space-y-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-purple-200 text-sm mb-2 font-semibold">
-                    Preparation Instructions
-                  </p>
-                  <p className="text-sm leading-relaxed">
-                    {typedPlan.prep_instructions}
-                  </p>
+                  <p className="text-purple-200 text-sm mb-1">Treatment Type</p>
+                  <p className="text-xl font-bold">{typedPlan.treatment_type}</p>
                 </div>
-              )}
 
-              {typedPlan.side_effects && typedPlan.side_effects.length > 0 && (
-                <div className="bg-amber-500/20 backdrop-blur-sm rounded-xl p-4 border border-amber-400/30">
-                  <p className="text-amber-100 text-sm mb-2 font-semibold">
-                    Possible Side Effects
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {typedPlan.side_effects.map((effect, index) => (
-                      <span
-                        key={index}
-                        className="inline-block text-xs bg-white/20 px-3 py-1 rounded-full"
-                      >
-                        {effect}
-                      </span>
-                    ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <p className="text-purple-200 text-sm mb-1">Sessions</p>
+                    <p className="text-2xl font-bold">{typedPlan.num_sessions}</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <p className="text-purple-200 text-sm mb-1">Start Date</p>
+                    <p className="text-lg font-bold">
+                      {new Date(typedPlan.start_date).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
                   </div>
                 </div>
-              )}
+
+                {typedPlan.prep_instructions && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <p className="text-purple-200 text-sm mb-2 font-semibold">
+                      Preparation Instructions
+                    </p>
+                    <p className="text-sm leading-relaxed">
+                      {typedPlan.prep_instructions}
+                    </p>
+                  </div>
+                )}
+
+                {typedPlan.side_effects && typedPlan.side_effects.length > 0 && (
+                  <div className="bg-amber-500/20 backdrop-blur-sm rounded-xl p-4 border border-amber-400/30">
+                    <p className="text-amber-100 text-sm mb-2 font-semibold">
+                      Possible Side Effects
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {typedPlan.side_effects.map((effect, index) => (
+                        <span
+                          key={index}
+                          className="inline-block text-xs bg-white/20 px-3 py-1 rounded-full"
+                        >
+                          {effect}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Help Card */}
         <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">

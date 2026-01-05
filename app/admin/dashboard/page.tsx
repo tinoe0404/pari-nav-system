@@ -9,10 +9,10 @@ import type { PatientData } from '@/types/patient'
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     status?: string
     success?: string
-    error?: string 
+    error?: string
   }>
 }
 
@@ -70,8 +70,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   // Count patients by status
   const statusCounts = {
     ALL: typedPatients.length,
-    REGISTERED: typedPatients.filter(p => p.current_status === 'REGISTERED').length,
-    SCANNED: typedPatients.filter(p => p.current_status === 'SCANNED').length,
+    AWAITING_SCAN: typedPatients.filter(p => p.current_status === 'CONSULTATION_COMPLETED').length,
+    PLANNING_QUEUE: typedPatients.filter(p => p.current_status === 'SCANNED' || p.current_status === 'PLANNING').length,
     PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
   }
 
@@ -80,7 +80,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'REGISTERED':
+        return 'bg-gray-100 text-gray-800 border-gray-300'
+      case 'INTAKE_COMPLETED':
         return 'bg-yellow-100 text-yellow-800 border-yellow-300'
+      case 'CONSULTATION_COMPLETED':
+        return 'bg-orange-100 text-orange-800 border-orange-300'
       case 'SCANNED':
         return 'bg-blue-100 text-blue-800 border-blue-300'
       case 'PLANNING':
@@ -97,11 +101,15 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'REGISTERED':
-        return 'Intake Complete'
+        return 'Registered'
+      case 'INTAKE_COMPLETED':
+        return 'Intake Done'
+      case 'CONSULTATION_COMPLETED':
+        return 'Awaiting Scan'
       case 'SCANNED':
-        return 'Scanned'
+        return 'Scan Complete'
       case 'PLANNING':
-        return 'Planning'
+        return 'In Planning'
       case 'PLAN_READY':
         return 'Plan Ready'
       case 'TREATING':
@@ -132,7 +140,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   <span className="text-sm font-bold text-red-900">{highRiskCount} High Risk</span>
                 </div>
               )}
-              
+
               <form action={logout}>
                 <button
                   type="submit"
@@ -180,11 +188,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             <nav className="flex -mb-px">
               <Link
                 href="/admin/dashboard"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
-                  activeFilter === 'ALL'
-                    ? 'border-purple-600 text-purple-600 bg-purple-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'ALL'
+                  ? 'border-purple-600 text-purple-600 bg-purple-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>All Patients</span>
@@ -194,42 +201,39 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 </div>
               </Link>
               <Link
-                href="/admin/dashboard?status=REGISTERED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
-                  activeFilter === 'REGISTERED'
-                    ? 'border-yellow-600 text-yellow-600 bg-yellow-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                href="/admin/dashboard?status=CONSULTATION_COMPLETED"
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'CONSULTATION_COMPLETED'
+                  ? 'border-orange-600 text-orange-600 bg-orange-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Awaiting Scan</span>
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800">
-                    {statusCounts.REGISTERED}
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
+                    {statusCounts.AWAITING_SCAN}
                   </span>
                 </div>
               </Link>
               <Link
                 href="/admin/dashboard?status=SCANNED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
-                  activeFilter === 'SCANNED'
-                    ? 'border-blue-600 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'SCANNED' || activeFilter === 'PLANNING'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Planning Queue</span>
                   <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                    {statusCounts.SCANNED}
+                    {statusCounts.PLANNING_QUEUE}
                   </span>
                 </div>
               </Link>
               <Link
                 href="/admin/dashboard?status=PLAN_READY"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${
-                  activeFilter === 'PLAN_READY'
-                    ? 'border-green-600 text-green-600 bg-green-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'PLAN_READY'
+                  ? 'border-green-600 text-green-600 bg-green-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Ready for Treatment</span>
@@ -249,7 +253,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
                   {activeFilter === 'ALL' && 'All Patients'}
-                  {activeFilter === 'REGISTERED' && 'Patients Awaiting Scan'}
+                  {activeFilter === 'CONSULTATION_COMPLETED' && 'Patients Awaiting Scan'}
                   {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
                   {activeFilter === 'PLAN_READY' && 'Patients Ready for Treatment'}
                 </h2>
@@ -257,7 +261,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   {typedPatients.length === 0 ? 'No patients found' : `${typedPatients.length} patient${typedPatients.length !== 1 ? 's' : ''}`}
                 </p>
               </div>
-              
+
               {typedPatients.length > 0 && typedPatients.filter(hasHighRiskCondition).length > 0 && (
                 <div className="flex items-center gap-4">
                   <div className="text-right">
@@ -307,17 +311,16 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {typedPatients.map((patient) => {
                     const isHighRisk = hasHighRiskCondition(patient)
-                    
+
                     return (
-                      <tr 
-                        key={patient.id} 
+                      <tr
+                        key={patient.id}
                         className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
-                            }`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
+                              }`}>
                               <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
                                 {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                               </span>
@@ -377,11 +380,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <Link
                             href={`/admin/patient/${patient.id}`}
-                            className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${
-                              isHighRisk 
-                                ? 'bg-red-600 hover:bg-red-700' 
-                                : 'bg-purple-600 hover:bg-purple-700'
-                            }`}
+                            className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
+                              ? 'bg-red-600 hover:bg-red-700'
+                              : 'bg-purple-600 hover:bg-purple-700'
+                              }`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
@@ -418,10 +420,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Awaiting Scan</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">{statusCounts.REGISTERED}</p>
+                <p className="text-3xl font-bold text-orange-600 mt-2">{statusCounts.AWAITING_SCAN}</p>
               </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -432,7 +434,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">In Planning</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">{statusCounts.SCANNED}</p>
+                <p className="text-3xl font-bold text-blue-600 mt-2">{statusCounts.PLANNING_QUEUE}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

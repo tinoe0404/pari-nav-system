@@ -1,7 +1,14 @@
 // types/patient.ts (UPDATE)
 import type { MedicalHistoryData } from './intake'
 
-export type PatientStatus = 'REGISTERED' | 'SCANNED' | 'PLANNING' | 'PLAN_READY' | 'TREATING'
+export type PatientStatus =
+  | 'REGISTERED'
+  | 'INTAKE_COMPLETED'
+  | 'CONSULTATION_COMPLETED'
+  | 'SCANNED'
+  | 'PLANNING'
+  | 'PLAN_READY'
+  | 'TREATING'
 
 export interface PatientData {
   id: string
@@ -40,4 +47,7 @@ export interface RoadmapStep {
   description?: string
   room?: string
   icon: 'check' | 'user' | 'scan' | 'clock' | 'heart'
+  controlledBy: 'patient' | 'admin' | 'auto'
+  actionRequired: boolean
+  actionLabel?: string
 }

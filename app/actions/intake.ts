@@ -90,6 +90,7 @@ export async function submitIntakeForm(formData: FormData) {
     .update({
       medical_history: medicalHistory,
       onboarding_completed: true,
+      current_status: 'INTAKE_COMPLETED',
       risk_flags: riskFlags,
     })
     .eq('id', patient.id)
