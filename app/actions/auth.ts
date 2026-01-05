@@ -14,32 +14,38 @@ export async function login(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { data: authData, error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`)
   }
 
-  // Get user role to determine redirect
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    revalidatePath('/', 'layout')
-    
-    if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') {
-      redirect('/admin/dashboard')
-    } else {
-      redirect('/dashboard')
-    }
+  if (!authData.user) {
+    redirect('/login?error=Login+failed+no+user+returned')
   }
 
-  redirect('/login?error=Login+failed')
+  // Refresh the session to ensure cookies are set
+  const { data: { user }, error: getUserError } = await supabase.auth.getUser()
+  
+  if (getUserError || !user) {
+    console.error('Failed to get user after login:', getUserError)
+    redirect('/login?error=Session+establishment+failed')
+  }
+
+  // Get user role to determine redirect
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  revalidatePath('/', 'layout')
+  
+  if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') {
+    redirect('/admin/dashboard')
+  } else {
+    redirect('/dashboard')
+  }
 }
 
 // app/actions/auth.ts - TEMPORARY DEBUG VERSION
@@ -155,20 +161,65 @@ export async function signup(formData: FormData) {
   // Step 2: Wait a moment for the database trigger to create the profile
   await new Promise(resolve => setTimeout(resolve, 1000))
 
-  // Step 3: Generate MRN
+  // Step 3: Generate MRN with retry logic for duplicates
   console.log('Generating MRN...')
-  const { data: mrnData, error: mrnError } = await supabase.rpc('generate_mrn')
   
-  if (mrnError) {
-    console.error('MRN generation error:', mrnError)
-    redirect(`/register?error=${encodeURIComponent('Failed to generate patient ID')}`)
+  // Use service role key to bypass RLS for patient creation
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('SUPABASE_SERVICE_ROLE_KEY not found')
+    redirect(`/register?error=${encodeURIComponent('Server configuration error. Please contact support.')}`)
   }
 
-  console.log('MRN generated:', mrnData)
+  const { createClient: createServiceClient } = await import('@supabase/supabase-js')
+  const adminClient = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
-  // Step 4: Create patient record
-  console.log('Creating patient record...')
-  const { data: patientData, error: patientError } = await supabase
+  // Retry logic for MRN generation (max 5 attempts)
+  let mrnData: string | null = null
+  let mrnError: any = null
+  const maxRetries = 5
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`MRN generation attempt ${attempt}/${maxRetries}...`)
+    
+    const { data: generatedMrn, error: genError } = await supabase.rpc('generate_mrn')
+    
+    if (genError) {
+      console.error(`MRN generation error (attempt ${attempt}):`, genError)
+      mrnError = genError
+      break
+    }
+
+    // Check if MRN already exists
+    const { data: existingPatient } = await adminClient
+      .from('patients')
+      .select('mrn')
+      .eq('mrn', generatedMrn)
+      .single()
+
+    if (!existingPatient) {
+      // MRN is available, use it
+      mrnData = generatedMrn
+      console.log('MRN generated successfully:', mrnData)
+      break
+    } else {
+      console.log(`MRN ${generatedMrn} already exists, retrying...`)
+      // Wait a bit before retrying
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+  }
+
+  if (mrnError || !mrnData) {
+    console.error('Failed to generate unique MRN after retries')
+    redirect(`/register?error=${encodeURIComponent('Failed to generate unique patient ID. Please try again.')}`)
+  }
+
+  // Step 4: Create patient record using service role to bypass RLS
+  console.log('Creating patient record with MRN:', mrnData)
+  
+  const { data: patientData, error: patientError } = await adminClient
     .from('patients')
     .insert({
       user_id: authData.user.id,
@@ -178,6 +229,7 @@ export async function signup(formData: FormData) {
       current_status: 'REGISTERED',
       onboarding_completed: false,
       medical_history: null,
+      admission_date: new Date().toISOString(),
     })
     .select()
     .single()
@@ -190,7 +242,13 @@ export async function signup(formData: FormData) {
       full_name: fullName,
       dob: dob,
     })
-    redirect(`/register?error=${encodeURIComponent('Failed to create patient record: ' + patientError.message)}`)
+    
+    // If it's still a duplicate error, something went wrong with our check
+    if (patientError.code === '23505') {
+      redirect(`/register?error=${encodeURIComponent('Patient ID conflict. Please try registering again.')}`)
+    } else {
+      redirect(`/register?error=${encodeURIComponent('Failed to create patient record: ' + patientError.message)}`)
+    }
   }
 
   console.log('Patient record created:', patientData)
@@ -207,6 +265,7 @@ export async function logout() {
 
   revalidatePath('/', 'layout')
   revalidatePath('/admin', 'layout')
+  revalidatePath('/dashboard', 'layout')
 
-  redirect('/admin/login')
+  redirect('/login')
 }

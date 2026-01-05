@@ -177,7 +177,7 @@ export default function Roadmap({
                     <p className="text-xs text-blue-600 mt-2">
                       Our radiotherapy team is carefully reviewing your scans and
                       creating your personalized treatment plan. This typically takes
-                      3-5 business days.
+                      5-7 days.
                     </p>
                   </div>
                 )}

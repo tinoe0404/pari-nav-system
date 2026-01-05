@@ -4,6 +4,9 @@ import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/actions/auth'
 import Roadmap from '@/components/Roadmap'
 import PatientInfoCard from '@/components/PatientInfoCard'
+import Phase1HeroCard from '@/components/Phase1HeroCard'
+import Phase2HeroCard from '@/components/Phase2HeroCard'
+import TreatmentTicket from '@/components/TreatmentTicket'
 import type { PatientData, TreatmentPlan } from '@/types/patient'
 
 export default async function PatientDashboard({
@@ -36,10 +39,21 @@ export default async function PatientDashboard({
   // CRITICAL FIX: Check for patient existence first
   // ============================================
   if (patientError || !patient) {
-    console.error('Patient lookup error:', patientError)
-    console.error('User ID:', user?.id)
-    console.error('User email:', user?.email)
-    console.error('Patient lookup error:', patientError)
+    // PGRST116 is expected when no patient record exists (not a real error)
+    const isNoRecordError = patientError?.code === 'PGRST116'
+    
+    if (!isNoRecordError && patientError) {
+      // Only log actual errors, not "no record found" cases
+      console.error('Patient lookup error:', {
+        code: patientError.code,
+        message: patientError.message,
+        details: patientError.details,
+        hint: patientError.hint,
+      })
+      console.error('User ID:', user?.id)
+      console.error('User email:', user?.email)
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
@@ -62,16 +76,25 @@ export default async function PatientDashboard({
             Patient Record Not Found
           </h2>
           <p className="text-gray-600 mb-6">
-            We couldn't find your patient record. Please contact the registration desk.
+            We couldn't find your patient record. This may happen if you haven't completed registration yet. 
+            Please contact the registration desk or try registering again.
           </p>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          <div className="flex flex-col gap-3">
+            <form action={logout}>
+              <button
+                type="submit"
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Return to Login
+              </button>
+            </form>
+            <a
+              href="/register"
+              className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-center"
             >
-              Return to Login
-            </button>
-          </form>
+              Register Again
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -80,16 +103,15 @@ export default async function PatientDashboard({
   const typedPatient = patient as PatientData
 
   // ============================================
-  // ONBOARDING GATE: Check AFTER we confirm patient exists
+  // THE GATE: Blocking redirect if medical_history is empty/null
   // ============================================
-  console.log('Checking onboarding status:', {
-    mrn: typedPatient.mrn,
-    onboarding_completed: typedPatient.onboarding_completed,
-  })
+  // Check medical_history directly (the source of truth)
+  const hasMedicalHistory = typedPatient.medical_history && 
+    Object.keys(typedPatient.medical_history).length > 0
 
-  if (!typedPatient.onboarding_completed) {
-    console.log('Redirecting to intake form...')
-    redirect('/patient/intake')
+  if (!hasMedicalHistory) {
+    console.log('Blocking redirect: medical_history is empty/null')
+    redirect('/onboarding')
   }
 
   // Fetch treatment plan if exists
@@ -189,10 +211,10 @@ export default async function PatientDashboard({
 
         {/* Welcome Message */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-4xl font-bold text-gray-900 mb-2">
             Welcome back, {typedPatient.full_name.split(' ')[0]}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-xl text-gray-600">
             Track your treatment journey and get real-time updates.
           </p>
         </div>
@@ -202,8 +224,25 @@ export default async function PatientDashboard({
           <PatientInfoCard patient={typedPatient} />
         </div>
 
-        {/* Treatment Journey Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        {/* ============================================ */}
+        {/* STATE-BASED HERO CARDS */}
+        {/* ============================================ */}
+        {typedPatient.current_status === 'REGISTERED' && (
+          <Phase1HeroCard
+            consultantRoom={typedPatient.consultant_name ? 'Room 104' : 'Room 104'}
+          />
+        )}
+
+        {typedPatient.current_status === 'SCANNED' && (
+          <Phase2HeroCard />
+        )}
+
+        {/* Treatment Journey Section - Show for all statuses but less prominent for REGISTERED/SCANNED */}
+        <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${
+          typedPatient.current_status === 'REGISTERED' || typedPatient.current_status === 'SCANNED'
+            ? 'opacity-75'
+            : ''
+        }`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg
@@ -231,8 +270,21 @@ export default async function PatientDashboard({
           />
         </div>
 
-        {/* Treatment Plan Card (if published) */}
-        {typedPlan && (
+        {/* ============================================ */}
+        {/* PHASE 3: THE TICKET (PLAN_READY/TREATING) */}
+        {/* ============================================ */}
+        {typedPlan && 
+         (typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATING') && (
+          <TreatmentTicket 
+            plan={typedPlan} 
+            patientName={typedPatient.full_name}
+          />
+        )}
+
+        {/* Legacy Treatment Plan Card - Show only if not PLAN_READY/TREATING */}
+        {typedPlan && 
+         typedPatient.current_status !== 'PLAN_READY' && 
+         typedPatient.current_status !== 'TREATING' && (
           <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">

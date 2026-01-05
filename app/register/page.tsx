@@ -2,14 +2,20 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { signup } from '@/app/actions/auth'
 
-export default function RegisterPage() {
+function RegisterFormContent() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
   const [passwordMatch, setPasswordMatch] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    
+    const formData = new FormData(e.currentTarget)
     const password = formData.get('password') as string
     const confirmPassword = formData.get('confirm_password') as string
 
@@ -21,7 +27,12 @@ export default function RegisterPage() {
     setPasswordMatch(true)
     setIsSubmitting(true)
 
-    await signup(formData)
+    try {
+      await signup(formData)
+    } catch (error) {
+      // Error is handled by redirect in signup function
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -56,7 +67,34 @@ export default function RegisterPage() {
             Patient Registration
           </h2>
 
-          <form action={handleSubmit} className="space-y-5">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-4">
+              <div className="flex gap-3">
+                <svg
+                  className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-red-900 mb-1">Registration Failed</p>
+                  <p className="text-sm text-red-800">
+                    {decodeURIComponent(error)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name Field */}
             <div>
               <label
@@ -241,5 +279,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
   )
 }

@@ -51,14 +51,23 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh session and get user
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   
-  // If there's an auth error, log it for debugging
-  if (authError) {
-    console.error('Middleware auth error:', authError)
-  }
-
   const path = request.nextUrl.pathname
+  
+  // Only log auth errors for protected routes (not public routes)
+  // AuthSessionMissingError is expected for unauthenticated users on public routes
+  if (authError && (path.startsWith('/admin') || path.startsWith('/dashboard'))) {
+    // Only log if it's not the expected "no session" error
+    if (authError.message !== 'Auth session missing!') {
+      console.error('Middleware auth error on protected route:', {
+        path,
+        error: authError.message,
+        code: authError.status,
+      })
+    }
+  }
 
   // ============================================
   // PROTECT /admin ROUTES (EXCEPT /admin/login)
@@ -96,6 +105,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
+    return response
+  }
+
+  // ============================================
+  // PROTECT /dashboard AND /onboarding ROUTES
+  // ============================================
+  if (path.startsWith('/dashboard') || path.startsWith('/onboarding')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('redirect', path)
+      return NextResponse.redirect(url)
+    }
     return response
   }
 

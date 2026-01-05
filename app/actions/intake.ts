@@ -43,11 +43,11 @@ export async function submitIntakeForm(formData: FormData) {
 
   // Validate required fields
   if (!currentSymptoms || !mobilityStatus || !nextOfKinName || !nextOfKinPhone) {
-    redirect('/patient/intake?error=Please fill in all required fields')
+    redirect('/onboarding?error=Please fill in all required fields')
   }
 
   if (!consentGiven) {
-    redirect('/patient/intake?error=You must provide consent to continue')
+    redirect('/onboarding?error=You must provide consent to continue')
   }
 
   // Build medical history object
@@ -96,7 +96,7 @@ export async function submitIntakeForm(formData: FormData) {
 
   if (updateError) {
     console.error('Error updating patient:', updateError)
-    redirect('/patient/intake?error=Failed to save form. Please try again.')
+    redirect('/onboarding?error=Failed to save form. Please try again.')
   }
 
   // Success - redirect to dashboard
