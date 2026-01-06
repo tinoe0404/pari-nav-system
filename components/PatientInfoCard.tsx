@@ -8,15 +8,15 @@ interface PatientInfoCardProps {
 
 export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl p-6 text-white">
+    <div className="bg-gradient-to-br from-violet-50 to-indigo-100 rounded-2xl shadow-lg border border-violet-200 p-6">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-blue-200 text-sm font-medium mb-1">Patient ID</p>
-          <p className="text-3xl font-bold tracking-wide">{patient.mrn}</p>
+          <p className="text-violet-600 text-sm font-medium mb-1">Patient ID</p>
+          <p className="text-3xl font-bold tracking-wide text-violet-900">{patient.mrn}</p>
         </div>
-        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-violet-200 rounded-xl flex items-center justify-center">
           <svg
-            className="w-7 h-7 text-white"
+            className="w-7 h-7 text-violet-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -31,31 +31,31 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
         </div>
       </div>
 
-      <div className="border-t border-white/20 pt-4 space-y-3">
+      <div className="border-t border-violet-200 pt-4 space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-blue-200 text-sm">Patient Name</span>
-          <span className="font-semibold">{patient.full_name}</span>
+          <span className="text-violet-600 text-sm">Patient Name</span>
+          <span className="font-semibold text-violet-900">{patient.full_name}</span>
         </div>
 
         {patient.consultant_name && (
           <div className="flex justify-between items-center">
-            <span className="text-blue-200 text-sm">Consultant</span>
-            <span className="font-semibold">{patient.consultant_name}</span>
+            <span className="text-violet-600 text-sm">Consultant</span>
+            <span className="font-semibold text-violet-900">{patient.consultant_name}</span>
           </div>
         )}
 
         <div className="flex justify-between items-center">
-          <span className="text-blue-200 text-sm">Current Status</span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-sm">
+          <span className="text-violet-600 text-sm">Current Status</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-violet-200 text-violet-800">
             {getStatusLabel(patient.current_status)}
           </span>
         </div>
 
         {patient.risk_flags && patient.risk_flags.length > 0 && (
-          <div className="mt-4 bg-amber-500/20 border border-amber-400/30 rounded-lg p-3">
+          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
             <div className="flex items-start gap-2">
               <svg
-                className="w-5 h-5 text-amber-300 flex-shrink-0 mt-0.5"
+                className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -68,14 +68,14 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
                 />
               </svg>
               <div>
-                <p className="text-sm font-semibold text-amber-100 mb-1">
+                <p className="text-sm font-semibold text-amber-800 mb-1">
                   Important Notes
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {patient.risk_flags.map((flag, index) => (
                     <span
                       key={index}
-                      className="inline-block text-xs bg-amber-400/30 px-2 py-1 rounded"
+                      className="inline-block text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded"
                     >
                       {flag}
                     </span>

@@ -26,7 +26,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
+        <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 50%, #f8fafc 100%)', minHeight: '100vh' }}>
             {/* Header */}
             <header className="bg-white shadow-sm border-b border-gray-200">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================
+   PARIRENYATWA MEDICAL UI THEME
+   Professional "Clean Room" Aesthetic
+   ============================================ */
+
+@theme {
+  /* === Background Gradients === */
+  /* Modern Hospital Slate (Admin/Staff Console) */
+  --color-admin-slate-from: #ebf0f5;
+  --color-admin-slate-to: #f8fafc;
+
+  /* Trust & Clarity Blue (Patient Portal) */
+  --color-patient-blue-from: #f0f4ff;
+  --color-patient-blue-via: #ffffff;
+  --color-patient-blue-to: #ffffff;
+
+  /* === Typography & Brand Colors === */
+  --color-primary-blue: #1a56db;
+  /* Headers, active nav, primary buttons */
+  --color-body-slate: #1f2937;
+  /* Body text - high legibility */
+
+  /* === Floating Card Design === */
+  --color-card-bg: #ffffff;
+
+  /* === Desaturated Badge Colors (Professional) === */
+  /* Success */
+  --color-badge-success-bg: #d1fae5;
+  --color-badge-success-text: #065f46;
+  --color-badge-success-border: #6ee7b7;
+
+  /* Warning */
+  --color-badge-warning-bg: #fef3c7;
+  --color-badge-warning-text: #92400e;
+  --color-badge-warning-border: #fcd34d;
+
+  /* Info/Blue */
+  --color-badge-info-bg: #dbeafe;
+  --color-badge-info-text: #1e40af;
+  --color-badge-info-border: #93c5fd;
+
+  /* Risk/Danger */
+  --color-badge-risk-bg: #fee2e2;
+  --color-badge-risk-text: #991b1b;
+  --color-badge-risk-border: #fca5a5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-foreground: var(--color-body-slate);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Card shadows */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* === Global Body Styles === */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-body-slate);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Floating Card Utility === */
+.floating-card {
+  background: var(--color-card-bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.floating-card:hover {
+  box-shadow: var(--shadow-card-hover);
 }

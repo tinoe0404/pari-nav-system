@@ -14,7 +14,7 @@ function RegisterFormContent() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    
+
     const formData = new FormData(e.currentTarget)
     const password = formData.get('password') as string
     const confirmPassword = formData.get('confirm_password') as string
@@ -36,7 +36,7 @@ function RegisterFormContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 50%, #f8fafc 100%)', minHeight: '100vh' }}>
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">

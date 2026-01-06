@@ -18,17 +18,17 @@ export default function PatientCard({
     return (
         <Link
             href={`/admin/patient/${patient.id}`}
-            className={`block bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-all ${isHighRisk ? 'ring-2 ring-red-300 bg-red-50/30' : ''
+            className={`block bg-white rounded-2xl shadow-sm border border-slate-200 p-4 hover:shadow-md hover:border-indigo-200 transition-all ${isHighRisk ? 'ring-2 ring-rose-300 bg-rose-50/30 border-rose-200' : ''
                 }`}
         >
             {/* Header with Avatar and Name */}
             <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                     <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
+                        className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-rose-100 ring-2 ring-rose-300' : 'bg-indigo-100'
                             }`}
                     >
-                        <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
+                        <span className={`font-bold text-sm ${isHighRisk ? 'text-rose-700' : 'text-indigo-700'}`}>
                             {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </span>
                     </div>
@@ -56,7 +56,7 @@ export default function PatientCard({
             <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
                     <p className="text-xs text-gray-600 font-medium">MRN</p>
-                    <p className="text-sm font-mono font-bold text-purple-700">{patient.mrn}</p>
+                    <p className="text-sm font-mono font-bold text-indigo-700">{patient.mrn}</p>
                 </div>
                 <div>
                     <p className="text-xs text-gray-600 font-medium">Admission</p>

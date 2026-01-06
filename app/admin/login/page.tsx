@@ -12,7 +12,7 @@ export default async function AdminLoginPage({
   const redirect = params.redirect
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(180deg, #dce3ed 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">
@@ -177,7 +177,7 @@ export default async function AdminLoginPage({
                   Staff Access Only
                 </p>
                 <p className="text-xs text-gray-600">
-                  This area is restricted to authorized medical personnel. 
+                  This area is restricted to authorized medical personnel.
                   Unauthorized access attempts are logged.
                 </p>
               </div>

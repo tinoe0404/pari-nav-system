@@ -123,7 +123,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #dce3ed 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
       {/* Header - Mobile Optimized */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
@@ -422,8 +422,8 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   <button
                     type="submit"
                     className={`w-full py-4 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${isHighRiskPatient
-                        ? 'bg-red-600 hover:bg-red-700'
-                        : 'bg-blue-600 hover:bg-blue-700'
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'bg-blue-600 hover:bg-blue-700'
                       }`}
                     style={{ minHeight: '44px' }}
                   >
