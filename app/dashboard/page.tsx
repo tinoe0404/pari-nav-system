@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx (MOBILE-OPTIMIZED)
+// app/dashboard/page.tsx (MOBILE-OPTIMIZED + REALTIME)
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/actions/auth'
@@ -8,6 +8,7 @@ import Phase1HeroCard from '@/components/Phase1HeroCard'
 import Phase2HeroCard from '@/components/Phase2HeroCard'
 import TreatmentTicket from '@/components/TreatmentTicket'
 import MobileNav from '@/components/MobileNav'
+import RealtimeListener from '@/components/RealtimeListener'
 import type { PatientData, TreatmentPlan } from '@/types/patient'
 
 export default async function PatientDashboard({

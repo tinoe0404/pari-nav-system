@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx (MOBILE-OPTIMIZED)
+// app/admin/dashboard/page.tsx (MOBILE-OPTIMIZED + REALTIME)
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
@@ -6,6 +6,7 @@ import { requireAdmin } from '@/utils/auth-helpers'
 import { logout } from '@/app/actions/auth'
 import MobileNav from '@/components/MobileNav'
 import PatientCard from '@/components/PatientCard'
+import RealtimeAdminListener from '@/components/RealtimeAdminListener'
 import type { PatientData } from '@/types/patient'
 
 export const dynamic = 'force-dynamic'

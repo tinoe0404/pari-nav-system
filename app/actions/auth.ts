@@ -32,20 +32,23 @@ export async function login(formData: FormData) {
     redirect('/login?error=Session+establishment+failed')
   }
 
-  // Get user role to determine redirect
+  // Get user role to determine access
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single()
 
-  revalidatePath('/', 'layout')
-
+  // SECURITY: Prevent admin accounts from logging in via patient portal
   if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') {
-    redirect('/admin/dashboard')
-  } else {
-    redirect('/dashboard')
+    // Sign out the admin user
+    await supabase.auth.signOut()
+    // Redirect to patient login with error message
+    redirect('/login?error=Admin+accounts+must+use+the+admin+login+page')
   }
+
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
 }
 
 // app/actions/auth.ts - TEMPORARY DEBUG VERSION
