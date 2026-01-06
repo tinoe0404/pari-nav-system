@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx (FIXED - Complete File)
+// app/dashboard/page.tsx (MOBILE-OPTIMIZED)
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/actions/auth'
@@ -7,6 +7,7 @@ import PatientInfoCard from '@/components/PatientInfoCard'
 import Phase1HeroCard from '@/components/Phase1HeroCard'
 import Phase2HeroCard from '@/components/Phase2HeroCard'
 import TreatmentTicket from '@/components/TreatmentTicket'
+import MobileNav from '@/components/MobileNav'
 import type { PatientData, TreatmentPlan } from '@/types/patient'
 
 export default async function PatientDashboard({
@@ -128,34 +129,40 @@ export default async function PatientDashboard({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+      {/* Header - Mobile Optimized */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto px-4  sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
+            {/* Mobile Nav + Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+              <MobileNav isPatient onLogout={logout} />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">
+                  Parirenyatwa Navigation
+                </h1>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">
-                Parirenyatwa Navigation
-              </h1>
             </div>
-            <form action={logout}>
+            {/* Desktop Logout Button - Hidden on mobile */}
+            <form action={logout} className="hidden md:block">
               <button
                 type="submit"
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                style={{ minHeight: '44px' }}
               >
                 <svg
                   className="w-5 h-5"
@@ -170,7 +177,7 @@ export default async function PatientDashboard({
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-                Logout
+                <span className="hidden lg:inline">Logout</span>
               </button>
             </form>
           </div>
@@ -209,12 +216,12 @@ export default async function PatientDashboard({
           </div>
         )}
 
-        {/* Welcome Message */}
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold text-gray-900 mb-2">
+        {/* Welcome Message - Mobile Optimized */}
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             Welcome back, {typedPatient.full_name.split(' ')[0]}
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600">
             Track your treatment journey and get real-time updates.
           </p>
         </div>
@@ -242,11 +249,11 @@ export default async function PatientDashboard({
 
         {/* Treatment Journey Section - Show for all statuses but less prominent for early stages */}
         <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${typedPatient.current_status === 'REGISTERED' ||
-            typedPatient.current_status === 'INTAKE_COMPLETED' ||
-            typedPatient.current_status === 'CONSULTATION_COMPLETED' ||
-            typedPatient.current_status === 'SCANNED'
-            ? 'opacity-75'
-            : ''
+          typedPatient.current_status === 'INTAKE_COMPLETED' ||
+          typedPatient.current_status === 'CONSULTATION_COMPLETED' ||
+          typedPatient.current_status === 'SCANNED'
+          ? 'opacity-75'
+          : ''
           }`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -393,10 +400,11 @@ export default async function PatientDashboard({
               <p className="text-blue-700 text-sm mb-4">
                 If you have any questions or need help finding your way, our staff is here to help.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-3">
                 <a
                   href="tel:+2634123456"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+                  style={{ minHeight: '44px' }}
                 >
                   <svg
                     className="w-5 h-5"
@@ -413,7 +421,10 @@ export default async function PatientDashboard({
                   </svg>
                   Call Reception
                 </a>
-                <button className="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-700 border-2 border-blue-300 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm">
+                <button
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white text-blue-700 border-2 border-blue-300 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm"
+                  style={{ minHeight: '44px' }}
+                >
                   <svg
                     className="w-5 h-5"
                     fill="none"

@@ -1,9 +1,11 @@
-// app/admin/dashboard/page.tsx (FIXED)
+// app/admin/dashboard/page.tsx (MOBILE-OPTIMIZED)
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
 import { logout } from '@/app/actions/auth'
+import MobileNav from '@/components/MobileNav'
+import PatientCard from '@/components/PatientCard'
 import type { PatientData } from '@/types/patient'
 
 export const dynamic = 'force-dynamic'
@@ -123,13 +125,17 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Console</h1>
-              <p className="text-sm text-gray-600 mt-1">Parirenyatwa Radiotherapy Department</p>
+      {/* Header - Mobile Optimized */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between gap-3">
+            {/* Mobile Nav + Title */}
+            <div className="flex items-center gap-3">
+              <MobileNav isAdmin onLogout={logout} />
+              <div>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Admin Console</h1>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1 hidden sm:block">Parirenyatwa Radiotherapy Department</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               {highRiskCount > 0 && (
@@ -141,10 +147,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 </div>
               )}
 
-              <form action={logout}>
+              <form action={logout} className="hidden md:block">
                 <button
                   type="submit"
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  style={{ minHeight: '44px' }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -284,119 +291,138 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               <p className="text-sm text-gray-500 mt-1">Patients will appear here once they complete registration</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Patient
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      MRN
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Admission Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Risk Level
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {typedPatients.map((patient) => {
-                    const isHighRisk = hasHighRiskCondition(patient)
+            <>
+              {/* Desktop Table View - Hidden on mobile */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Patient
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        MRN
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Admission Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Risk Level
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {typedPatients.map((patient) => {
+                      const isHighRisk = hasHighRiskCondition(patient)
 
-                    return (
-                      <tr
-                        key={patient.id}
-                        className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
-                              }`}>
-                              <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
-                                {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                              </span>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-semibold text-gray-900">
-                                {patient.full_name}
+                      return (
+                        <tr
+                          key={patient.id}
+                          className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
+                                }`}>
+                                <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
+                                  {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                </span>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-mono font-bold text-purple-700">
-                            {patient.mrn}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
-                            {new Date(patient.admission_date).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
-                            {getStatusLabel(patient.current_status)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
-                            {isHighRisk ? (
-                              <div className="flex flex-col items-center gap-1">
-                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse">
-                                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                  </svg>
+                              <div className="ml-4">
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {patient.full_name}
                                 </div>
-                                <span className="text-xs font-bold text-red-800 uppercase">High</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-1">
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
-                                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
+                                <div className="text-xs text-gray-500">
+                                  DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
                                 </div>
-                                <span className="text-xs font-medium text-green-800">Standard</span>
                               </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <Link
-                            href={`/admin/patient/${patient.id}`}
-                            className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
-                              ? 'bg-red-600 hover:bg-red-700'
-                              : 'bg-purple-600 hover:bg-purple-700'
-                              }`}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                            </svg>
-                            {isHighRisk ? 'Review (⚠️ Risk)' : 'Manage'}
-                          </Link>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-mono font-bold text-purple-700">
+                              {patient.mrn}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">
+                              {new Date(patient.admission_date).toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
+                              {getStatusLabel(patient.current_status)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center justify-center">
+                              {isHighRisk ? (
+                                <div className="flex flex-col items-center gap-1">
+                                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse">
+                                    <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-xs font-bold text-red-800 uppercase">High</span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-1">
+                                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
+                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-xs font-medium text-green-800">Standard</span>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <Link
+                              href={`/admin/patient/${patient.id}`}
+                              className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
+                                ? 'bg-red-600 hover:bg-red-700'
+                                : 'bg-purple-600 hover:bg-purple-700'
+                                }`}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                              </svg>
+                              {isHighRisk ? 'Review (⚠️ Risk)' : 'Manage'}
+                            </Link>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View - Visible only on mobile */}
+              <div className="md:hidden space-y-4 p-4">
+                {typedPatients.map((patient) => {
+                  const isHighRisk = hasHighRiskCondition(patient)
+                  return (
+                    <PatientCard
+                      key={patient.id}
+                      patient={patient}
+                      isHighRisk={isHighRisk}
+                      statusBadgeColor={getStatusBadgeColor(patient.current_status)}
+                      statusLabel={getStatusLabel(patient.current_status)}
+                    />
+                  )
+                })}
+              </div>
+            </>
           )}
         </div>
 

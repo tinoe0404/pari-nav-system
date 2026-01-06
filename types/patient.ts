@@ -13,6 +13,7 @@ export type PatientStatus =
 export interface PatientData {
   id: string
   user_id: string
+  email: string  // Patient email for notifications
   mrn: string
   legacy_mrn: string | null
   full_name: string

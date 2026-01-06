@@ -1,9 +1,11 @@
-// app/admin/patient/[id]/page.tsx
+// app/admin/patient/[id]/page.tsx (MOBILE-OPTIMIZED)
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
 import { logPatientScan } from '@/app/admin/actions'
+import MobileNav from '@/components/MobileNav'
+import { logout } from '@/app/actions/auth'
 import type { PatientData } from '@/types/patient'
 import type { MedicalHistoryData } from '@/types/intake'
 
@@ -122,25 +124,26 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+      {/* Header - Mobile Optimized */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <Link
                 href="/admin/dashboard"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                style={{ minHeight: '44px', minWidth: '44px' }}
               >
                 <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </Link>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Patient Management</h1>
-                <p className="text-sm text-gray-600">{typedPatient.full_name} • {typedPatient.mrn}</p>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">Patient Management</h1>
+                <p className="text-xs sm:text-sm text-gray-600 truncate">{typedPatient.full_name} • {typedPatient.mrn}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {/* High Risk Banner */}
               {isHighRiskPatient && (
                 <div className="flex items-center gap-2 px-4 py-2 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
@@ -183,8 +186,8 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
           </div>
         )}
 
-        {/* Two-Column Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        {/* Two-Column Grid - Mobile: Stack vertically */}
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* LEFT COLUMN: Patient Context */}
           <div className="space-y-6">
             {/* Patient Info Card */}
@@ -412,6 +415,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Minimum 10 characters. These notes are confidential.
+                      ```
                     </p>
                   </div>
 
@@ -421,6 +425,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                         ? 'bg-red-600 hover:bg-red-700'
                         : 'bg-blue-600 hover:bg-blue-700'
                       }`}
+                    style={{ minHeight: '44px' }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -112,7 +112,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
       if (result.success) {
         // Check if email notification succeeded
         const emailStatus = result.data?.emailNotification
-        
+
         if (emailStatus?.emailSent) {
           // Full success - plan published AND email sent
           router.push('/admin/dashboard?success=Treatment plan published successfully. Patient has been notified via email.')
@@ -138,14 +138,14 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
   // Calculate estimated end date
   const calculateEndDate = () => {
     if (!startDate || numSessions < 1) return null
-    
+
     const start = new Date(startDate)
     // Assume treatments Mon-Fri (5 days per week)
     const weeks = Math.ceil(numSessions / 5)
     const days = weeks * 7 - 2 // Subtract weekend days
     const end = new Date(start)
     end.setDate(start.getDate() + days)
-    
+
     return end.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
@@ -157,19 +157,20 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               href={`/admin/patient/${patientId}`}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              style={{ minHeight: '44px', minWidth: '44px' }}
             >
               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Treatment Planning</h1>
-              <p className="text-sm text-gray-600">Create and publish treatment schedule</p>
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">Treatment Planning</h1>
+              <p className="text-xs sm:text-sm text-gray-600">Create and publish treatment schedule</p>
             </div>
           </div>
         </div>
@@ -190,7 +191,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 Medical Physicist Review Required
               </h3>
               <p className="text-sm text-blue-700 leading-relaxed">
-                This treatment plan will be immediately visible to the patient once published. 
+                This treatment plan will be immediately visible to the patient once published.
                 The patient will receive an <strong>automatic email notification</strong> with their schedule.
                 Please verify all details carefully before submission.
               </p>
@@ -244,12 +245,11 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Treatment Type <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    treatmentType === 'External Beam'
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentType === 'External Beam'
                       ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
                       : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-                  }`}>
+                    }`}>
                     <input
                       type="radio"
                       name="treatmentType"
@@ -264,11 +264,10 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                       <span className="text-xs text-gray-500">LINAC therapy</span>
                     </div>
                   </label>
-                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    treatmentType === 'Brachytherapy'
+                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentType === 'Brachytherapy'
                       ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
                       : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-                  }`}>
+                    }`}>
                     <input
                       type="radio"
                       name="treatmentType"
@@ -300,9 +299,9 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setNumSessions(parseInt(e.target.value) || 1)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${
-                      validationErrors.numSessions ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-base ${validationErrors.numSessions ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                      }`}
+                    style={{ minHeight: '44px' }}
                   />
                   <div className="absolute right-3 top-3 text-gray-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,8 +333,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
             </div>
 
             <div className="space-y-5">
-              {/* Start Date & Time */}
-              <div className="grid md:grid-cols-2 gap-4">
+              {/* Start Date & Time - Mobile: Stack vertically */}
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Start Date <span className="text-red-500">*</span>
@@ -347,9 +346,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setStartDate(e.target.value)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${
-                      validationErrors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                      }`}
                   />
                   {validationErrors.startDate && (
                     <p className="text-xs text-red-600 mt-1">{validationErrors.startDate}</p>
@@ -365,9 +363,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setStartTime(e.target.value)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${
-                      validationErrors.startTime ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startTime ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                      }`}
                   />
                   {validationErrors.startTime && (
                     <p className="text-xs text-red-600 mt-1">{validationErrors.startTime}</p>
@@ -451,7 +448,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Potential Side Effects (Select all that apply)
                 </label>
-                <div className="grid md:grid-cols-2 gap-3">
+                <div className="grid sm:grid-cols-2 gap-3">
                   {[
                     { value: 'Fatigue', desc: 'Tiredness, low energy' },
                     { value: 'Skin Redness', desc: 'Irritation at treatment site' },
@@ -464,11 +461,10 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                   ].map((effect) => (
                     <label
                       key={effect.value}
-                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                        sideEffects.includes(effect.value)
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${sideEffects.includes(effect.value)
                           ? 'border-orange-500 bg-orange-50'
                           : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                      }`}
+                        }`}
                     >
                       <input
                         type="checkbox"
@@ -500,8 +496,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
               <div>
                 <p className="font-semibold mb-1">Ready to Publish Treatment Plan?</p>
                 <p className="text-sm text-purple-100 leading-relaxed">
-                  The patient will receive immediate notification with their treatment schedule, preparation 
-                  instructions, and expected side effects. This action cannot be undone. Please ensure all 
+                  The patient will receive immediate notification with their treatment schedule, preparation
+                  instructions, and expected side effects. This action cannot be undone. Please ensure all
                   details are accurate before publishing.
                 </p>
               </div>
@@ -533,7 +529,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-white text-purple-700 py-4 rounded-lg font-bold text-lg hover:bg-purple-50 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full bg-white text-purple-700 py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-purple-50 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              style={{ minHeight: '48px' }}
             >
               {isSubmitting ? (
                 <>

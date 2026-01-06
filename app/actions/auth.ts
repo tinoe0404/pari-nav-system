@@ -224,6 +224,7 @@ export async function signup(formData: FormData) {
     .from('patients')
     .insert({
       user_id: authData.user.id,
+      email: email,  // Store email for notifications
       mrn: mrnData,
       full_name: fullName,
       dob: dob,

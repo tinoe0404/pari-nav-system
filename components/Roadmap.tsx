@@ -108,8 +108,8 @@ export default function Roadmap({
       {actionMessage && (
         <div
           className={`p-4 rounded-xl border-2 ${actionMessage.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-green-50 border-green-200 text-green-800'
+            : 'bg-red-50 border-red-200 text-red-800'
             }`}
         >
           <div className="flex items-center gap-2">
@@ -133,10 +133,10 @@ export default function Roadmap({
           {index < steps.length - 1 && (
             <div
               className={`absolute left-8 top-20 w-1 h-20 -ml-px transition-all duration-500 ${step.status === 'completed'
-                  ? 'bg-gradient-to-b from-green-500 to-green-400'
-                  : step.status === 'active'
-                    ? 'bg-gradient-to-b from-blue-500 to-blue-300'
-                    : 'bg-gray-300'
+                ? 'bg-gradient-to-b from-green-500 to-green-400'
+                : step.status === 'active'
+                  ? 'bg-gradient-to-b from-blue-500 to-blue-300'
+                  : 'bg-gray-300'
                 }`}
             />
           )}
@@ -144,10 +144,10 @@ export default function Roadmap({
           {/* Step Card */}
           <div
             className={`relative flex flex-col gap-4 p-6 rounded-2xl transition-all duration-500 ${step.status === 'completed'
-                ? 'bg-green-50 border-2 border-green-200'
-                : step.status === 'active'
-                  ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-400 shadow-xl shadow-blue-200 scale-105'
-                  : 'bg-gray-50 border-2 border-gray-200 opacity-60'
+              ? 'bg-green-50 border-2 border-green-200'
+              : step.status === 'active'
+                ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-400 shadow-xl shadow-blue-200 scale-105'
+                : 'bg-gray-50 border-2 border-gray-200 opacity-60'
               }`}
           >
             {/* Current Step Badge */}
@@ -166,10 +166,10 @@ export default function Roadmap({
               {/* Icon Circle */}
               <div
                 className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 ${step.status === 'completed'
-                    ? 'bg-green-500 shadow-lg shadow-green-300'
-                    : step.status === 'active'
-                      ? 'bg-white border-4 border-blue-600 shadow-xl shadow-blue-300'
-                      : 'bg-gray-300'
+                  ? 'bg-green-500 shadow-lg shadow-green-300'
+                  : step.status === 'active'
+                    ? 'bg-white border-4 border-blue-600 shadow-xl shadow-blue-300'
+                    : 'bg-gray-300'
                   }`}
               >
                 {step.status === 'locked' ? (
@@ -184,10 +184,10 @@ export default function Roadmap({
                 {/* Step Label */}
                 <h3
                   className={`text-xl font-bold mb-1 transition-colors ${step.status === 'completed'
-                      ? 'text-green-900'
-                      : step.status === 'active'
-                        ? 'text-blue-900'
-                        : 'text-gray-500'
+                    ? 'text-green-900'
+                    : step.status === 'active'
+                      ? 'text-blue-900'
+                      : 'text-gray-500'
                     }`}
                 >
                   {step.label}
@@ -199,10 +199,10 @@ export default function Roadmap({
                 {/* Description */}
                 <p
                   className={`text-sm mt-2 transition-colors ${step.status === 'completed'
-                      ? 'text-green-700'
-                      : step.status === 'active'
-                        ? 'text-blue-800 font-medium'
-                        : 'text-gray-500'
+                    ? 'text-green-700'
+                    : step.status === 'active'
+                      ? 'text-blue-800 font-medium'
+                      : 'text-gray-500'
                     }`}
                 >
                   {step.description}
@@ -273,6 +273,7 @@ export default function Roadmap({
                   onClick={handleConsultationComplete}
                   disabled={isSubmitting}
                   className="w-full mt-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{ minHeight: '48px' }}
                 >
                   {isSubmitting ? (
                     <>

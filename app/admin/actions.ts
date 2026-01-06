@@ -234,7 +234,7 @@ export async function publishTreatmentPlan(
     // Step 1: Verify patient exists and is in correct status
     const { data: patient, error: patientCheckError } = await supabase
       .from('patients')
-      .select('id, mrn, full_name, current_status, user_id')
+      .select('id, mrn, full_name, current_status, user_id, email')
       .eq('id', patientId)
       .single()
 
@@ -315,29 +315,25 @@ export async function publishTreatmentPlan(
       }
     }
 
-    // Step 5: Get patient's email address for notification using Supabase Auth
-    const { data: authData, error: userError } = await supabase.auth.admin.getUserById(
-      patient.user_id
-    )
-
+    // Step 5: Send email notification using stored email address
     let emailNotification: EmailNotificationResult = {
       emailSent: false,
       emailError: 'Email address not found'
     }
 
     // Step 6: Send email notification (non-blocking with error handling)
-    if (userError || !authData?.user?.email) {
-      console.warn(`⚠️  Could not find email for patient ${patient.mrn}:`, userError?.message)
+    if (!patient.email || patient.email.trim() === '') {
+      console.warn(`⚠️  Patient ${patient.mrn} does not have an email address stored`)
       emailNotification.emailError = 'Patient email address not found in system'
     } else {
       try {
-        console.log(`📧 Sending plan ready email to ${authData.user.email}...`)
-        emailNotification = await sendPlanReadyEmail(authData.user.email, patient.full_name)
+        console.log(`📧 Sending plan ready email to ${patient.email}...`)
+        emailNotification = await sendPlanReadyEmail(patient.email, patient.full_name)
 
         if (emailNotification.emailSent) {
-          console.log(`✅ Email successfully sent to ${authData.user.email}`)
+          console.log(`✅ Email successfully sent to ${patient.email}`)
         } else {
-          console.error(`❌ Failed to send email to ${authData.user.email}:`, emailNotification.emailError)
+          console.error(`❌ Failed to send email to ${patient.email}:`, emailNotification.emailError)
         }
       } catch (emailError) {
         // Catch any unexpected errors from email sending
