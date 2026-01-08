@@ -72,6 +72,11 @@ export async function sendPlanReadyEmail(
     // Create transporter
     const transporter = createEmailTransporter()
 
+    // Ensure clean base URL
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+    const dashboardUrl = `${baseUrl}/dashboard`
+    console.log('🔗 Generated Plan URL:', dashboardUrl)
+
     // Email content
     const subject = 'Update: Radiotherapy Plan Ready'
 
@@ -117,7 +122,7 @@ export async function sendPlanReadyEmail(
               <table role="presentation" style="margin: 0 auto;">
                 <tr>
                   <td style="border-radius: 4px; background-color: #2563eb;">
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard" 
+                    <a href="${dashboardUrl}" 
                        style="display: inline-block; padding: 14px 32px; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold;">
                       View Treatment Plan
                     </a>
@@ -157,7 +162,7 @@ Your radiotherapy treatment plan has been prepared and is now ready for review.
 
 Please log in to your patient dashboard to view your treatment schedule, preparation instructions, and other important details.
 
-Dashboard: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard
+Dashboard: ${dashboardUrl}
 
 If you have any questions or concerns, please contact your healthcare provider or our support team.
 
@@ -214,7 +219,12 @@ export async function sendTreatmentCompletionEmail(
 
     const transporter = createEmailTransporter()
     const subject = 'Congratulations! Treatment Completed 🎓'
-    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`
+
+    // Ensure clean base URL without trailing slash
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+    const dashboardUrl = `${baseUrl}/dashboard`
+
+    console.log('🔗 Generated Dashboard URL:', dashboardUrl)
 
     const htmlBody = `
 <!DOCTYPE html>
