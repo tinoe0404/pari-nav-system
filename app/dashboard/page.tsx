@@ -6,6 +6,7 @@ import Roadmap from '@/components/Roadmap'
 import PatientInfoCard from '@/components/PatientInfoCard'
 import Phase1HeroCard from '@/components/Phase1HeroCard'
 import Phase2HeroCard from '@/components/Phase2HeroCard'
+import ScanHeroCard from '@/components/ScanHeroCard'
 import TreatmentTicket from '@/components/TreatmentTicket'
 import TreatmentCertificate from '@/components/TreatmentCertificate'
 import MobileNav from '@/components/MobileNav'
@@ -243,11 +244,15 @@ export default async function PatientDashboard({
           />
         )}
 
-        {/* Show planning hero card when scanned or consultation completed */}
-        {(typedPatient.current_status === 'SCANNED' ||
-          typedPatient.current_status === 'CONSULTATION_COMPLETED') && (
-            <Phase2HeroCard />
-          )}
+        {/* Show Scan Instructions when Consultation is complete */}
+        {typedPatient.current_status === 'CONSULTATION_COMPLETED' && (
+          <ScanHeroCard />
+        )}
+
+        {/* Show planning hero card ONLY when scanned */}
+        {typedPatient.current_status === 'SCANNED' && (
+          <Phase2HeroCard />
+        )}
 
         {/* Treatment Journey Section - Show for all statuses but less prominent for early stages */}
         <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${typedPatient.current_status === 'REGISTERED' ||
