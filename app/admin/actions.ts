@@ -454,3 +454,71 @@ export async function getPatientTreatmentPlans(patientId: string) {
     }
   }
 }
+
+// ============================================
+// 5. COMPLETE TREATMENT (DISCHARGE)
+// ============================================
+
+export async function completeTreatment(
+  patientId: string
+): Promise<ActionResponse> {
+  try {
+    // Verify admin access
+    await requireAdmin()
+
+    if (!patientId?.trim()) {
+      return { success: false, error: 'Patient ID is required' }
+    }
+
+    const supabase = await createClient()
+
+    // Step 1: Fetch patient status
+    const { data: patient, error: patientError } = await supabase
+      .from('patients')
+      .select('id, mrn, current_status')
+      .eq('id', patientId)
+      .single()
+
+    if (patientError || !patient) {
+      return { success: false, error: 'Patient not found' }
+    }
+
+    // Step 2: Validate status
+    // Allow completion from TREATING (normal flow) or PLAN_READY (if they skipped active tracking)
+    if (patient.current_status !== 'TREATING' && patient.current_status !== 'PLAN_READY') {
+      return {
+        success: false,
+        error: `Cannot complete treatment. Patient is in '${patient.current_status}' status. Must be TREATING or PLAN_READY.`
+      }
+    }
+
+    // Step 3: Update status
+    const { error: updateError } = await supabase
+      .from('patients')
+      .update({
+        current_status: 'TREATMENT_COMPLETED',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', patientId)
+
+    if (updateError) {
+      console.error('Complete treatment error:', updateError)
+      return { success: false, error: `Failed to update status: ${updateError.message}` }
+    }
+
+    // Step 4: Revalidate
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+    revalidatePath(`/admin/patient/${patientId}`)
+    revalidatePath('/dashboard')
+
+    return { success: true }
+
+  } catch (error) {
+    console.error('completeTreatment error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unexpected error occurred'
+    }
+  }
+}

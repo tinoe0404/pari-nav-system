@@ -7,6 +7,7 @@ import PatientInfoCard from '@/components/PatientInfoCard'
 import Phase1HeroCard from '@/components/Phase1HeroCard'
 import Phase2HeroCard from '@/components/Phase2HeroCard'
 import TreatmentTicket from '@/components/TreatmentTicket'
+import TreatmentCertificate from '@/components/TreatmentCertificate'
 import MobileNav from '@/components/MobileNav'
 import RealtimeListener from '@/components/RealtimeListener'
 import type { PatientData, TreatmentPlan } from '@/types/patient'
@@ -293,6 +294,19 @@ export default async function PatientDashboard({
               patientName={typedPatient.full_name}
             />
           )}
+
+        {/* PHASE 4: COMPLETION (TREATMENT_COMPLETED) */}
+        {typedPatient.current_status === 'TREATMENT_COMPLETED' && (
+          <TreatmentCertificate
+            patientName={typedPatient.full_name}
+            treatmentType={typedPlan?.treatment_type || 'Prescribed Treatment'}
+            completionDate={new Date(typedPatient.updated_at).toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
+          />
+        )}
 
         {/* Legacy Treatment Plan Card - Show only if not PLAN_READY/TREATING */}
         {typedPlan &&

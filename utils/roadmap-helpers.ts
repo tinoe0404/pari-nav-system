@@ -10,6 +10,7 @@ export function getStatusLabel(status: PatientStatus): string {
     PLANNING: 'Treatment Plan Ready',
     PLAN_READY: 'Ready to Begin Treatment',
     TREATING: 'Receiving Treatment',
+    TREATMENT_COMPLETED: 'Treatment Completed',
   }
   return labels[status]
 }
@@ -23,6 +24,7 @@ export function getStatusColor(status: PatientStatus): string {
     PLANNING: 'bg-yellow-500',
     PLAN_READY: 'bg-purple-500',
     TREATING: 'bg-indigo-500',
+    TREATMENT_COMPLETED: 'bg-green-600',
   }
   return colors[status]
 }
@@ -42,6 +44,7 @@ export function generateRoadmap(
     'PLANNING',
     'PLAN_READY',
     'TREATING',
+    'TREATMENT_COMPLETED',
   ]
 
   const isStatusAtLeast = (
@@ -139,15 +142,19 @@ export function generateRoadmap(
     {
       id: 5,
       label: 'Treatment',
-      status: isStatusAtLeast(currentStatus, 'PLAN_READY')
-        ? 'active'
-        : 'locked',
+      status: currentStatus === 'TREATMENT_COMPLETED'
+        ? 'completed'
+        : isStatusAtLeast(currentStatus, 'PLAN_READY')
+          ? 'active'
+          : 'locked',
       description:
-        currentStatus === 'PLAN_READY'
-          ? 'View your treatment schedule below'
-          : currentStatus === 'TREATING'
-            ? 'Treatment in progress'
-            : 'Complete all previous steps first',
+        currentStatus === 'TREATMENT_COMPLETED'
+          ? 'Treatment successfully completed'
+          : currentStatus === 'PLAN_READY'
+            ? 'View your treatment schedule below'
+            : currentStatus === 'TREATING'
+              ? 'Treatment in progress'
+              : 'Complete all previous steps first',
       icon: 'heart',
       controlledBy: 'auto',
       actionRequired: false,

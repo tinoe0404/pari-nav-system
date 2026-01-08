@@ -38,14 +38,14 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
 
   return (
     <div className="mb-8">
-      {/* Step 3 Header */}
-      <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-4 border-purple-400 rounded-3xl shadow-2xl p-8 mb-6">
-        <div className="flex items-start gap-6">
+      {/* Step 3 Header - Mobile Optimized */}
+      <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-4 border-purple-400 rounded-3xl shadow-2xl p-5 sm:p-8 mb-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
           {/* Large Icon */}
           <div className="flex-shrink-0">
-            <div className="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
               <svg
-                className="w-12 h-12 text-white"
+                className="w-8 h-8 sm:w-12 sm:h-12 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -61,19 +61,19 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
           </div>
 
           {/* Content */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             {/* Step Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-full mb-4">
-              <span className="text-lg font-bold">Step 3</span>
-              <span className="w-2 h-2 bg-white rounded-full"></span>
-              <span className="text-sm font-semibold">Treatment Ready</span>
+            <div className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-500 text-white rounded-full mb-4 max-w-full">
+              <span className="text-base sm:text-lg font-bold whitespace-nowrap">Step 3</span>
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full flex-shrink-0"></span>
+              <span className="text-xs sm:text-sm font-semibold whitespace-nowrap">Treatment Ready</span>
             </div>
 
             {/* Main Heading */}
-            <h2 className="text-4xl font-bold text-purple-900 mb-2">
+            <h2 className="text-2xl sm:text-4xl font-bold text-purple-900 mb-2">
               Treatment Ready
             </h2>
-            <p className="text-xl text-purple-700">
+            <p className="text-base sm:text-xl text-purple-700">
               Your treatment plan is ready. Please review your boarding pass below.
             </p>
           </div>
@@ -82,55 +82,55 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
 
       {/* BOARDING PASS STYLE TICKET */}
       <div className="bg-white rounded-3xl shadow-2xl border-4 border-purple-300 overflow-hidden">
-        {/* Ticket Header - Airline-style */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6">
-          <div className="flex items-center justify-between">
+        {/* Ticket Header - Mobile Optimized */}
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-purple-200 uppercase tracking-wide mb-1">
+              <p className="text-xs sm:text-sm font-semibold text-purple-200 uppercase tracking-wide mb-1">
                 Parirenyatwa Hospital
               </p>
-              <p className="text-2xl font-bold">Treatment Boarding Pass</p>
+              <p className="text-xl sm:text-2xl font-bold leading-tight">Treatment Boarding Pass</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-purple-200 mb-1">Patient</p>
-              <p className="text-lg font-bold">{patientName.split(' ')[0]}</p>
+            <div className="flex items-center justify-between sm:block sm:text-right border-t border-purple-500/30 sm:border-0 pt-3 sm:pt-0 mt-2 sm:mt-0 w-full sm:w-auto">
+              <p className="text-xs sm:text-sm text-purple-200 sm:mb-1">Patient</p>
+              <p className="text-base sm:text-lg font-bold">{patientName.split(' ')[0]}</p>
             </div>
           </div>
         </div>
 
         {/* Ticket Body */}
-        <div className="p-8">
-          <div className="grid md:grid-cols-2 gap-8">
+        <div className="p-5 sm:p-8">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
             {/* Left Column - Date & Time */}
-            <div className="space-y-6">
-              {/* Start Date - HUGE */}
-              <div className="bg-purple-50 rounded-2xl p-6 border-2 border-purple-200">
-                <p className="text-sm font-semibold text-purple-700 uppercase tracking-wide mb-3">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Start Date */}
+              <div className="bg-purple-50 rounded-2xl p-5 sm:p-6 border-2 border-purple-200">
+                <p className="text-xs sm:text-sm font-semibold text-purple-700 uppercase tracking-wide mb-2 sm:mb-3">
                   Start Date
                 </p>
-                <p className="text-4xl font-bold text-purple-900 leading-tight">
+                <p className="text-2xl sm:text-4xl font-bold text-purple-900 leading-tight break-words">
                   {formattedDate}
                 </p>
               </div>
 
-              {/* Start Time - HUGE */}
-              <div className="bg-indigo-50 rounded-2xl p-6 border-2 border-indigo-200">
-                <p className="text-sm font-semibold text-indigo-700 uppercase tracking-wide mb-3">
+              {/* Start Time */}
+              <div className="bg-indigo-50 rounded-2xl p-5 sm:p-6 border-2 border-indigo-200">
+                <p className="text-xs sm:text-sm font-semibold text-indigo-700 uppercase tracking-wide mb-2 sm:mb-3">
                   Start Time
                 </p>
-                <p className="text-4xl font-bold text-indigo-900 leading-tight">
+                <p className="text-2xl sm:text-4xl font-bold text-indigo-900 leading-tight">
                   {formattedTime}
                 </p>
               </div>
             </div>
 
             {/* Right Column - Location & Details */}
-            <div className="space-y-6">
-              {/* Location (Room Number) - HUGE */}
-              <div className="bg-emerald-50 rounded-2xl p-6 border-2 border-emerald-200">
-                <div className="flex items-center gap-4 mb-3">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Location */}
+              <div className="bg-emerald-50 rounded-2xl p-5 sm:p-6 border-2 border-emerald-200">
+                <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
                   <svg
-                    className="w-8 h-8 text-emerald-600"
+                    className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -148,32 +148,32 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <p className="text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+                  <p className="text-xs sm:text-sm font-semibold text-emerald-700 uppercase tracking-wide">
                     Location
                   </p>
                 </div>
-                <p className="text-4xl font-bold text-emerald-900 leading-tight">
+                <p className="text-2xl sm:text-4xl font-bold text-emerald-900 leading-tight">
                   {treatmentRoom}
                 </p>
               </div>
 
-              {/* Treatment Details - Enhanced */}
-              <div className="bg-slate-50 rounded-2xl p-6 border-2 border-slate-200">
-                <p className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">
+              {/* Treatment Details */}
+              <div className="bg-slate-50 rounded-2xl p-5 sm:p-6 border-2 border-slate-200">
+                <p className="text-xs sm:text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3 sm:mb-4">
                   Treatment Details
                 </p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b border-slate-200">
-                    <span className="text-slate-600 font-medium">Treatment Type</span>
-                    <span className="font-bold text-slate-900 text-lg">{plan.treatment_type}</span>
+                    <span className="text-sm sm:text-base text-slate-600 font-medium">Treatment Type</span>
+                    <span className="font-bold text-slate-900 text-base sm:text-lg text-right">{plan.treatment_type}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-slate-200">
-                    <span className="text-slate-600 font-medium">Total Sessions</span>
-                    <span className="font-bold text-slate-900 text-lg">{plan.num_sessions} sessions</span>
+                    <span className="text-sm sm:text-base text-slate-600 font-medium">Total Sessions</span>
+                    <span className="font-bold text-slate-900 text-base sm:text-lg">{plan.num_sessions} sessions</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-600 font-medium">Plan Status</span>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-800">
+                    <span className="text-sm sm:text-base text-slate-600 font-medium">Plan Status</span>
+                    <span className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-semibold bg-emerald-100 text-emerald-800">
                       ✓ Published
                     </span>
                   </div>
@@ -182,14 +182,14 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
             </div>
           </div>
 
-          {/* Side Effects Section - NEW */}
+          {/* Side Effects Section */}
           {plan.side_effects && plan.side_effects.length > 0 && (
-            <div className="mt-8 bg-rose-50 border-2 border-rose-200 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
+            <div className="mt-6 sm:mt-8 bg-rose-50 border-2 border-rose-200 rounded-2xl p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-14 h-14 bg-rose-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-rose-100 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-8 h-8 text-rose-600"
+                      className="w-6 h-6 sm:w-8 sm:h-8 text-rose-600"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -204,20 +204,20 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-rose-800 uppercase tracking-wide mb-3">
+                  <p className="text-xs sm:text-sm font-semibold text-rose-800 uppercase tracking-wide mb-2 sm:mb-3">
                     Possible Side Effects
                   </p>
                   <p className="text-sm text-rose-700 mb-4">
                     You may experience some of the following during or after treatment. Please report any concerns to your care team.
                   </p>
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {plan.side_effects.map((effect, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 border border-rose-200"
+                        className="flex items-center gap-3 bg-white rounded-lg px-3 py-2 sm:px-4 sm:py-3 border border-rose-200"
                       >
                         <span className="w-2 h-2 bg-rose-400 rounded-full flex-shrink-0"></span>
-                        <span className="text-rose-900 font-medium">{effect}</span>
+                        <span className="text-sm sm:text-base text-rose-900 font-medium">{effect}</span>
                       </div>
                     ))}
                   </div>
@@ -226,23 +226,23 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
             </div>
           )}
 
-          {/* Prep Warning - PROMINENT */}
+          {/* Prep Warning */}
           {plan.prep_instructions && (
-            <div className="mt-8 bg-amber-50 border-4 border-amber-400 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
+            <div className="mt-6 sm:mt-8 bg-amber-50 border-4 border-amber-400 rounded-2xl p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
-                    <span className="text-4xl">⚠️</span>
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-amber-500 rounded-full flex items-center justify-center">
+                    <span className="text-2xl sm:text-4xl">⚠️</span>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-amber-800 uppercase tracking-wide mb-2">
+                  <p className="text-xs sm:text-sm font-semibold text-amber-800 uppercase tracking-wide mb-2">
                     Important Preparation Required
                   </p>
-                  <p className="text-2xl font-bold text-amber-900">
+                  <p className="text-xl sm:text-2xl font-bold text-amber-900">
                     {plan.prep_instructions}
                   </p>
-                  <p className="text-base text-amber-800 mt-3">
+                  <p className="text-sm sm:text-base text-amber-800 mt-2 sm:mt-3">
                     Please follow these instructions carefully before your treatment session.
                   </p>
                 </div>
@@ -253,7 +253,7 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
 
         {/* Ticket Footer */}
         <div className="bg-gray-100 border-t-2 border-gray-200 p-4">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-600 text-center sm:text-left">
             <p className="font-semibold">Please arrive 15 minutes early</p>
             <p>Bring your ID and this boarding pass</p>
           </div>

@@ -9,6 +9,7 @@ export type PatientStatus =
   | 'PLANNING'
   | 'PLAN_READY'
   | 'TREATING'
+  | 'TREATMENT_COMPLETED'
 
 export interface PatientData {
   id: string

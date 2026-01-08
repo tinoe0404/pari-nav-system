@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
-import { logPatientScan } from '@/app/admin/actions'
+import { logPatientScan, completeTreatment } from '@/app/admin/actions'
 import MobileNav from '@/components/MobileNav'
 import { logout } from '@/app/actions/auth'
 import type { PatientData } from '@/types/patient'
@@ -76,6 +76,17 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     }
   }
 
+  // Server Action for completing treatment
+  async function handleCompleteTreatment() {
+    'use server'
+    const result = await completeTreatment(id)
+    if (result.success) {
+      redirect(`/admin/patient/${id}?success=Treatment completed successfully. Patient discharged.`)
+    } else {
+      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to complete treatment')}`)
+    }
+  }
+
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'REGISTERED':
@@ -105,6 +116,8 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
         return 'Plan Ready'
       case 'TREATING':
         return 'Treating'
+      case 'TREATMENT_COMPLETED':
+        return 'Discharged'
       default:
         return status
     }
@@ -570,6 +583,40 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     </Link>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* COMPLETION: Discharge Action */}
+            {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY') && (
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md p-6 mb-6">
+                <h2 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Complete Treatment
+                </h2>
+                <div className="mb-6">
+                  <p className="text-sm text-green-800 mb-2">
+                    Mark the treatment course as successfully completed.
+                  </p>
+                  <ul className="text-xs text-green-700 space-y-1 list-disc list-inside bg-green-100/50 p-3 rounded-lg">
+                    <li>Updates patient status to <strong>Discharged</strong></li>
+                    <li>Generates discharge certificate in Patient Portal</li>
+                    <li>Archives active treatment plan</li>
+                  </ul>
+                </div>
+
+                <form action={handleCompleteTreatment}>
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirm Completion & Discharge
+                  </button>
+                </form>
               </div>
             )}
 
