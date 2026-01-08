@@ -43,7 +43,13 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     .order('admission_date', { ascending: false })
 
   if (statusFilter && statusFilter !== 'ALL') {
-    query = query.eq('current_status', statusFilter)
+    if (statusFilter === 'IN_REVIEWS') {
+      query = query.in('current_status', ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'])
+    } else if (statusFilter === 'DISCHARGED_GROUP') {
+      query = query.in('current_status', ['TREATMENT_COMPLETED', 'JOURNEY_COMPLETE'])
+    } else {
+      query = query.eq('current_status', statusFilter)
+    }
   }
 
   const { data: patients, error: fetchError } = await query
@@ -77,12 +83,16 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     AWAITING_SCAN: typedPatients.filter(p => p.current_status === 'CONSULTATION_COMPLETED').length,
     PLANNING_QUEUE: typedPatients.filter(p => p.current_status === 'SCANNED' || p.current_status === 'PLANNING').length,
     PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
-    COMPLETED: typedPatients.filter(p => p.current_status === 'TREATMENT_COMPLETED').length,
+    IN_REVIEWS: typedPatients.filter(p => ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'].includes(p.current_status)).length,
+    COMPLETED: typedPatients.filter(p => ['TREATMENT_COMPLETED', 'JOURNEY_COMPLETE'].includes(p.current_status)).length,
   }
 
   const highRiskCount = typedPatients.filter(hasHighRiskCondition).length
 
   const getStatusBadgeColor = (status: string) => {
+    if (status.startsWith('REVIEW_') || status === 'REVIEWS_COMPLETED') {
+      return 'bg-amber-100 text-amber-800 border-amber-300'
+    }
     switch (status) {
       case 'REGISTERED':
         return 'bg-gray-100 text-gray-800 border-gray-300'
@@ -100,6 +110,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         return 'bg-indigo-100 text-indigo-800 border-indigo-300'
       case 'TREATMENT_COMPLETED':
         return 'bg-teal-100 text-teal-800 border-teal-300'
+      case 'JOURNEY_COMPLETE':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-300'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300'
     }
@@ -121,8 +133,18 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         return 'Plan Ready'
       case 'TREATING':
         return 'Treating'
+      case 'REVIEW_1_PENDING':
+        return 'Review 1 Pending'
+      case 'REVIEW_2_PENDING':
+        return 'Review 2 Pending'
+      case 'REVIEW_3_PENDING':
+        return 'Review 3 Pending'
+      case 'REVIEWS_COMPLETED':
+        return 'Reviews Done'
       case 'TREATMENT_COMPLETED':
         return 'Discharged'
+      case 'JOURNEY_COMPLETE':
+        return 'Journey Complete'
       default:
         return status
     }
@@ -259,14 +281,28 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   </div>
                 </Link>
                 <Link
-                  href="/admin/dashboard?status=TREATMENT_COMPLETED"
-                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'TREATMENT_COMPLETED'
+                  href="/admin/dashboard?status=IN_REVIEWS"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'IN_REVIEWS'
+                    ? 'border-amber-500 text-amber-600 bg-amber-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap text-center">In Reviews</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-amber-100 text-amber-700">
+                      {statusCounts.IN_REVIEWS}
+                    </span>
+                  </div>
+                </Link>
+                <Link
+                  href="/admin/dashboard?status=DISCHARGED_GROUP"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'DISCHARGED_GROUP' || activeFilter === 'TREATMENT_COMPLETED'
                     ? 'border-teal-500 text-teal-600 bg-teal-50'
                     : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                 >
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
-                    <span className="whitespace-nowrap text-center">Treatment<br className="sm:hidden" /> Complete</span>
+                    <span className="whitespace-nowrap text-center">Discharged</span>
                     <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-teal-100 text-teal-700">
                       {statusCounts.COMPLETED}
                     </span>
@@ -286,14 +322,15 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   {activeFilter === 'ALL' && 'All Patients'}
                   {activeFilter === 'CONSULTATION_COMPLETED' && 'Patients Awaiting Scan'}
                   {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
-                  {activeFilter === 'CONSULTATION_COMPLETED' && 'Patients Awaiting Scan'}
-                  {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
+                  {activeFilter === 'PLANNING' && 'Patients in Planning'}
                   {activeFilter === 'PLAN_READY' && 'Patients Ready for Treatment'}
-                  {activeFilter === 'TREATMENT_COMPLETED' && 'Discharged Patients'}
+                  {activeFilter === 'IN_REVIEWS' && 'Patients in Follow-Up Reviews'}
+                  {(activeFilter === 'DISCHARGED_GROUP' || activeFilter === 'TREATMENT_COMPLETED') && 'Discharged & Completed Patients'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {typedPatients.length === 0 ? 'No patients found' : `${typedPatients.length} patient${typedPatients.length !== 1 ? 's' : ''}`}
                 </p>
+                <RealtimeAdminListener />
               </div>
 
               {typedPatients.length > 0 && typedPatients.filter(hasHighRiskCondition).length > 0 && (

@@ -11,6 +11,11 @@ export function getStatusLabel(status: PatientStatus): string {
     PLAN_READY: 'Ready to Begin Treatment',
     TREATING: 'Receiving Treatment',
     TREATMENT_COMPLETED: 'Treatment Completed',
+    REVIEW_1_PENDING: 'Review 1 Pending',
+    REVIEW_2_PENDING: 'Review 2 Pending',
+    REVIEW_3_PENDING: 'Review 3 Pending',
+    REVIEWS_COMPLETED: 'Awaiting Final Decision',
+    JOURNEY_COMPLETE: 'Journey Complete ✓',
   }
   return labels[status]
 }
@@ -24,7 +29,12 @@ export function getStatusColor(status: PatientStatus): string {
     PLANNING: 'bg-yellow-500',
     PLAN_READY: 'bg-purple-500',
     TREATING: 'bg-indigo-500',
-    TREATMENT_COMPLETED: 'bg-green-600',
+    TREATMENT_COMPLETED: 'bg-teal-600',
+    REVIEW_1_PENDING: 'bg-orange-600',
+    REVIEW_2_PENDING: 'bg-orange-600',
+    REVIEW_3_PENDING: 'bg-orange-600',
+    REVIEWS_COMPLETED: 'bg-purple-600',
+    JOURNEY_COMPLETE: 'bg-emerald-600',
   }
   return colors[status]
 }
@@ -45,6 +55,11 @@ export function generateRoadmap(
     'PLAN_READY',
     'TREATING',
     'TREATMENT_COMPLETED',
+    'REVIEW_1_PENDING',
+    'REVIEW_2_PENDING',
+    'REVIEW_3_PENDING',
+    'REVIEWS_COMPLETED',
+    'JOURNEY_COMPLETE',
   ]
 
   const isStatusAtLeast = (
@@ -142,13 +157,13 @@ export function generateRoadmap(
     {
       id: 5,
       label: 'Treatment',
-      status: currentStatus === 'TREATMENT_COMPLETED'
+      status: isStatusAtLeast(currentStatus, 'TREATMENT_COMPLETED')
         ? 'completed'
         : isStatusAtLeast(currentStatus, 'PLAN_READY')
           ? 'active'
           : 'locked',
       description:
-        currentStatus === 'TREATMENT_COMPLETED'
+        isStatusAtLeast(currentStatus, 'TREATMENT_COMPLETED')
           ? 'Treatment successfully completed'
           : currentStatus === 'PLAN_READY'
             ? 'View your treatment schedule below'
@@ -159,6 +174,30 @@ export function generateRoadmap(
       controlledBy: 'auto',
       actionRequired: false,
     },
+
+    // Step 6: Follow-Up Reviews (only show if in review status)
+    ...(['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED', 'JOURNEY_COMPLETE'].includes(currentStatus)
+      ? [
+        {
+          id: 6,
+          label: 'Follow-Up Reviews',
+          status: currentStatus === 'JOURNEY_COMPLETE'
+            ? 'completed' as const
+            : ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'].includes(currentStatus)
+              ? 'active' as const
+              : 'locked' as const,
+          description:
+            currentStatus === 'JOURNEY_COMPLETE'
+              ? 'All reviews completed successfully'
+              : currentStatus === 'REVIEWS_COMPLETED'
+                ? 'Reviews complete - awaiting final decision'
+                : 'Attend your scheduled review appointments',
+          icon: 'check' as const,
+          controlledBy: 'admin' as const,
+          actionRequired: false,
+        },
+      ]
+      : []),
   ]
 
   return steps

@@ -4,9 +4,15 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
 import { logPatientScan, completeTreatment } from '@/app/admin/actions'
+import {
+  schedulePostTreatmentReviews,
+  markReviewComplete,
+  finalizeTreatmentSuccess,
+  restartTreatment
+} from '@/app/admin/review-actions'
 import MobileNav from '@/components/MobileNav'
 import { logout } from '@/app/actions/auth'
-import type { PatientData } from '@/types/patient'
+import type { PatientData, TreatmentReview } from '@/types/patient'
 import type { MedicalHistoryData } from '@/types/intake'
 
 interface PageProps {
@@ -56,6 +62,17 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     .eq('is_published', true)
     .single()
 
+  // Fetch reviews ONLY for the current active treatment plan
+  const { data: reviews } = await supabase
+    .from('treatment_reviews')
+    .select('*')
+    .eq('patient_id', id)
+    .order('review_number', { ascending: true })
+
+  const typedReviews = ((reviews || []) as TreatmentReview[])
+    .filter(r => treatmentPlan ? r.treatment_plan_id === treatmentPlan.id : true)
+
+
   // Server Action for scan form submission
   async function handleScanSubmit(formData: FormData) {
     'use server'
@@ -76,14 +93,78 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     }
   }
 
-  // Server Action for completing treatment
-  async function handleCompleteTreatment() {
+  // Server Action for scheduling reviews
+  async function handleScheduleReviews(formData: FormData) {
     'use server'
-    const result = await completeTreatment(id)
+
+    const result = await schedulePostTreatmentReviews({
+      patientId: id,
+      treatmentPlanId: treatmentPlan?.id || '',
+      reviews: [
+        {
+          reviewNumber: 1,
+          reviewDate: formData.get('review1Date') as string,
+          officeLocation: formData.get('review1Office') as string,
+        },
+        {
+          reviewNumber: 2,
+          reviewDate: formData.get('review2Date') as string,
+          officeLocation: formData.get('review2Office') as string,
+        },
+        {
+          reviewNumber: 3,
+          reviewDate: formData.get('review3Date') as string,
+          officeLocation: formData.get('review3Office') as string,
+        },
+      ],
+    })
+
     if (result.success) {
-      redirect(`/admin/patient/${id}?success=Treatment completed successfully. Patient discharged.`)
+      const message = result.warning || 'Reviews scheduled successfully. Patient notified via email.'
+      redirect(`/admin/patient/${id}?success=${encodeURIComponent(message)}`)
     } else {
-      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to complete treatment')}`)
+      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to schedule reviews')}`)
+    }
+  }
+
+  // Server Action for marking review complete
+  async function handleMarkReviewComplete(reviewId: string, notes: string) {
+    'use server'
+
+    const result = await markReviewComplete(reviewId, notes)
+
+    if (result.success) {
+      redirect(`/admin/patient/${id}?success=Review marked as complete. Patient status updated.`)
+    } else {
+      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to mark review complete')}`)
+    }
+  }
+
+  // Server Action for treatment success
+  async function handleTreatmentSuccess(formData: FormData) {
+    'use server'
+
+    const outcomeNotes = formData.get('outcomeNotes') as string
+    const result = await finalizeTreatmentSuccess(id, outcomeNotes)
+
+    if (result.success) {
+      redirect(`/admin/patient/${id}?success=Treatment finalized as successful! Patient journey complete.`)
+    } else {
+      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to finalize treatment')}`)
+    }
+  }
+
+  // Server Action for treatment restart
+  async function handleTreatmentRestart(formData: FormData) {
+    'use server'
+
+    const reason = formData.get('reason') as string
+    const result = await restartTreatment(id, reason)
+
+    if (result.success) {
+      redirect(`/admin/patient/${id}?success=Treatment restarted. Patient returned to planning queue.`)
+    } else {
+      redirect(`/admin/patient/${id}?error=${encodeURIComponent(result.error || 'Failed to restart treatment')}`)
     }
   }
 
@@ -99,6 +180,16 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
         return 'bg-green-100 text-green-800 border-green-300'
       case 'TREATING':
         return 'bg-indigo-100 text-indigo-800 border-indigo-300'
+      case 'TREATMENT_COMPLETED':
+        return 'bg-teal-100 text-teal-800 border-teal-300'
+      case 'REVIEW_1_PENDING':
+      case 'REVIEW_2_PENDING':
+      case 'REVIEW_3_PENDING':
+        return 'bg-orange-100 text-orange-800 border-orange-300'
+      case 'REVIEWS_COMPLETED':
+        return 'bg-purple-100 text-purple-800 border-purple-300'
+      case 'JOURNEY_COMPLETE':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-300'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300'
     }
@@ -117,7 +208,17 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
       case 'TREATING':
         return 'Treating'
       case 'TREATMENT_COMPLETED':
-        return 'Discharged'
+        return 'Treatment Complete'
+      case 'REVIEW_1_PENDING':
+        return 'Review 1 Pending'
+      case 'REVIEW_2_PENDING':
+        return 'Review 2 Pending'
+      case 'REVIEW_3_PENDING':
+        return 'Review 3 Pending'
+      case 'REVIEWS_COMPLETED':
+        return 'Awaiting Decision'
+      case 'JOURNEY_COMPLETE':
+        return 'Journey Complete ✓'
       default:
         return status
     }
@@ -586,37 +687,267 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             )}
 
-            {/* COMPLETION: Discharge Action */}
-            {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY') && (
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md p-6 mb-6">
-                <h2 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {/* SCHEDULE REVIEWS: For TREATING or PLAN_READY status */}
+            {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATMENT_COMPLETED') && typedReviews.length === 0 && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md p-6 mb-6">
+                <h2 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  Complete Treatment
+                  Schedule Post-Treatment Reviews
                 </h2>
-                <div className="mb-6">
-                  <p className="text-sm text-green-800 mb-2">
-                    Mark the treatment course as successfully completed.
+
+                <div className="mb-6 bg-blue-100/50 border-l-4 border-blue-500 p-4 rounded">
+                  <p className="text-sm text-blue-900 font-medium">
+                    After treatment completion, schedule 3 follow-up review appointments to monitor the patient's recovery and determine treatment outcome.
                   </p>
-                  <ul className="text-xs text-green-700 space-y-1 list-disc list-inside bg-green-100/50 p-3 rounded-lg">
-                    <li>Updates patient status to <strong>Discharged</strong></li>
-                    <li>Generates discharge certificate in Patient Portal</li>
-                    <li>Archives active treatment plan</li>
-                  </ul>
                 </div>
 
-                <form action={handleCompleteTreatment}>
+                <form action={handleScheduleReviews} className="space-y-6">
+                  {[1, 2, 3].map(num => (
+                    <div key={num} className="bg-white border-2 border-blue-200 rounded-lg p-5">
+                      <h3 className="text-md font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {num}
+                        </span>
+                        Review {num}
+                      </h3>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Review Date <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="date"
+                            name={`review${num}Date`}
+                            required
+                            min={new Date().toISOString().split('T')[0]}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Office/Room Location <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name={`review${num}Office`}
+                            required
+                            placeholder="e.g., Oncology Clinic Room 3"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
                   <button
                     type="submit"
-                    className="w-full py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Confirm Completion & Discharge
+                    Schedule All Reviews & Notify Patient
                   </button>
                 </form>
+              </div>
+            )}
+
+            {/* REVIEW PROGRESS: Show when reviews are scheduled */}
+            {typedReviews.length > 0 && ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING'].includes(typedPatient.current_status) && (
+              <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  Post-Treatment Reviews
+                </h2>
+
+                <div className="space-y-4">
+                  {typedReviews.map(review => (
+                    <div
+                      key={review.id}
+                      className={`border-2 rounded-lg p-5 ${review.is_completed
+                        ? 'bg-green-50 border-green-300'
+                        : 'bg-orange-50 border-orange-300'
+                        }`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${review.is_completed ? 'bg-green-600' : 'bg-orange-600'
+                            }`}>
+                            {review.is_completed ? '✓' : review.review_number}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-900">Review {review.review_number}</h3>
+                            <p className="text-sm text-gray-600">
+                              📅 {new Date(review.review_date).toLocaleDateString('en-GB', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </p>
+                            <p className="text-sm text-gray-600">📍 {review.office_location}</p>
+                          </div>
+                        </div>
+
+                        {review.is_completed && (
+                          <span className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full">
+                            COMPLETED
+                          </span>
+                        )}
+                      </div>
+
+                      {review.is_completed ? (
+                        <div className="mt-3 bg-white border border-green-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-green-700 mb-1">
+                            Completed: {new Date(review.completed_at!).toLocaleDateString('en-GB')}
+                          </p>
+                          {review.review_notes && (
+                            <p className="text-sm text-gray-700 mt-2">
+                              <span className="font-semibold">Notes:</span> {review.review_notes}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <form
+                          action={async (formData: FormData) => {
+                            'use server'
+                            const notes = formData.get('notes') as string
+                            await handleMarkReviewComplete(review.id, notes)
+                          }}
+                          className="mt-4"
+                        >
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Review Notes (Optional)
+                          </label>
+                          <textarea
+                            name="notes"
+                            rows={3}
+                            placeholder="Add any observations or notes from this review..."
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none resize-none mb-3"
+                          />
+                          <button
+                            type="submit"
+                            className="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Mark Review {review.review_number} as Complete
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* FINAL DECISION: Show when all reviews are complete */}
+            {typedPatient.current_status === 'REVIEWS_COMPLETED' && (
+              <div className="space-y-6 mb-6">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300 rounded-xl shadow-lg p-6">
+                  <h2 className="text-xl font-bold text-purple-900 mb-2 flex items-center gap-2">
+                    <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    All Reviews Complete - Final Decision Required
+                  </h2>
+                  <p className="text-sm text-purple-800">
+                    All 3 post-treatment reviews have been completed. Please make a final decision on the treatment outcome.
+                  </p>
+                </div>
+
+                {/* Treatment Successful Option */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl shadow-md p-6">
+                  <h3 className="text-lg font-bold text-green-900 mb-3 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ✅ Treatment Successful
+                  </h3>
+                  <p className="text-sm text-green-800 mb-4">
+                    Mark this treatment as successful. The patient will be notified that their cancer treatment journey is complete.
+                  </p>
+
+                  <form action={handleTreatmentSuccess}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Success Notes (Optional)
+                    </label>
+                    <textarea
+                      name="outcomeNotes"
+                      rows={3}
+                      placeholder="Add any final notes about the successful outcome..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none resize-none mb-4"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Confirm Treatment Success & Complete Journey
+                    </button>
+                  </form>
+                </div>
+
+                {/* Treatment Restart Option */}
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl shadow-md p-6">
+                  <h3 className="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    🔄 Restart Treatment
+                  </h3>
+                  <p className="text-sm text-amber-800 mb-4">
+                    If the treatment was not successful, restart the process. The patient will return to the planning stage for a new treatment plan.
+                  </p>
+
+                  <form action={handleTreatmentRestart}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Reason for Restart <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="reason"
+                      rows={4}
+                      required
+                      placeholder="Explain why the treatment needs to be restarted (e.g., tumor progression, treatment ineffective, etc.)..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all outline-none resize-none mb-4"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full py-4 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Restart Treatment Process
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* JOURNEY COMPLETE: Show completion message */}
+            {typedPatient.current_status === 'JOURNEY_COMPLETE' && (
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-xl shadow-lg p-8 mb-6 text-center">
+                <div className="text-6xl mb-4">🎉</div>
+                <h2 className="text-2xl font-bold text-emerald-900 mb-3">
+                  Treatment Journey Complete!
+                </h2>
+                <p className="text-emerald-800 mb-4">
+                  This patient has successfully completed their entire cancer treatment journey.
+                  All reviews were satisfactory and treatment has been marked as successful.
+                </p>
+                <div className="inline-block bg-emeraldcol-600 text-white px-6 py-3 rounded-lg font-bold">
+                  ✓ Journey Completed
+                </div>
               </div>
             )}
 

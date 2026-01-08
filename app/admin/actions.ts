@@ -9,6 +9,11 @@ import {
   sendTreatmentCompletionEmail,
   type EmailNotificationResult
 } from '@/lib/email'
+import {
+  sendReviewScheduleEmail,
+  sendTreatmentSuccessEmail,
+  sendTreatmentRestartEmail
+} from '@/lib/email-reviews'
 
 // ============================================
 // TYPE DEFINITIONS
@@ -34,6 +39,16 @@ export interface ActionResponse<T = void> {
   data?: T
   error?: string
   warning?: string  // For non-critical issues like email failures
+}
+
+export interface ScheduleReviewsInput {
+  patientId: string
+  treatmentPlanId: string
+  reviews: Array<{
+    reviewNumber: 1 | 2 | 3
+    reviewDate: string
+    officeLocation: string
+  }>
 }
 
 // ============================================

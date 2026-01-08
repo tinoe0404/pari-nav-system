@@ -11,7 +11,7 @@ import TreatmentTicket from '@/components/TreatmentTicket'
 import TreatmentCertificate from '@/components/TreatmentCertificate'
 import MobileNav from '@/components/MobileNav'
 import RealtimeListener from '@/components/RealtimeListener'
-import type { PatientData, TreatmentPlan } from '@/types/patient'
+import type { PatientData, TreatmentPlan, TreatmentReview } from '@/types/patient'
 
 export default async function PatientDashboard({
   searchParams,
@@ -129,6 +129,19 @@ export default async function PatientDashboard({
     .single()
 
   const typedPlan = treatmentPlan as TreatmentPlan | null
+
+  // Fetch treatment reviews if patient is in review status
+  // Fetch treatment reviews if patient is in review status
+  const { data: reviews } = await supabase
+    .from('treatment_reviews')
+    .select('*')
+    .eq('patient_id', typedPatient.id)
+    .order('review_number', { ascending: true })
+
+  // FILTER: Only show reviews linked to the current active treatment plan
+  // This prevents seeing "Review 1" twice if they had a previous failed plan
+  const typedReviews = ((reviews || []) as TreatmentReview[])
+    .filter(r => typedPlan ? r.treatment_plan_id === typedPlan.id : true)
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 50%, #f8fafc 100%)', minHeight: '100vh' }}>
@@ -300,8 +313,165 @@ export default async function PatientDashboard({
             />
           )}
 
+        {/* ============================================ */}
+        {/* REVIEW SCHEDULE: Show when in review status */}
+        {/* ============================================ */}
+        {['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'TREATMENT_COMPLETED'].includes(typedPatient.current_status) && typedReviews.length > 0 && (
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl shadow-xl p-6 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">Follow-Up Reviews</h3>
+                <p className="text-orange-700 text-sm">Your scheduled check-ups</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
+              <p className="text-sm text-blue-900 font-medium">
+                📅 You have {typedReviews.length} follow-up review appointments scheduled. Please attend all appointments to complete your treatment journey.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {typedReviews.map(review => (
+                <div
+                  key={review.id}
+                  className={`border-2 rounded-xl p-5 ${review.is_completed
+                    ? 'bg-green-50 border-green-300'
+                    : 'bg-white border-orange-300'
+                    }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${review.is_completed ? 'bg-green-600' : 'bg-orange-600'
+                        }`}>
+                        {review.is_completed ? '✓' : review.review_number}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg">Review {review.review_number}</h4>
+                        <p className="text-sm text-gray-600">
+                          {review.is_completed ? 'Completed' : 'Scheduled'}
+                        </p>
+                      </div>
+                    </div>
+                    {review.is_completed && (
+                      <span className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full">
+                        ✓ DONE
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="bg-white/70 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        {new Date(review.review_date).toLocaleDateString('en-GB', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-sm font-medium">{review.office_location}</span>
+                    </div>
+                    {review.is_completed && review.completed_at && (
+                      <div className="pt-2 border-t border-green-200 mt-2">
+                        <p className="text-xs text-green-700 font-semibold">
+                          Completed on {new Date(review.completed_at).toLocaleDateString('en-GB')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ============================================ */}
+        {/* JOURNEY COMPLETE: Celebration! */}
+        {/* ============================================ */}
+        {typedPatient.current_status === 'JOURNEY_COMPLETE' && (
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-2xl shadow-xl p-8 mb-8 text-center">
+            <div className="text-7xl mb-4">🎉</div>
+            <h3 className="text-3xl md:text-4xl font-bold text-emerald-900 mb-4">
+              Congratulations, {typedPatient.full_name.split(' ')[0]}!
+            </h3>
+            <div className="bg-emerald-100 border-2 border-emerald-300 rounded-xl p-6 mb-6">
+              <p className="text-lg text-emerald-900 mb-3">
+                🌟 You have successfully completed your entire cancer treatment journey! 🌟
+              </p>
+              <p className="text-emerald-800">
+                All your follow-up reviews were satisfactory, and your healthcare team has confirmed your successful recovery.
+              </p>
+            </div>
+            <div className="inline-block bg-emerald-600 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg">
+              ✓ Journey Complete
+            </div>
+            <p className="mt-6 text-gray-600 text-sm">
+              Thank you for trusting us with your care. We wish you continued health and happiness!
+            </p>
+          </div>
+        )}
+
+        {/* ============================================ */}
+        {/* TREATMENT RESTARTED: Show notification */}
+        {/* ============================================ */}
+        {typedPatient.current_status === 'SCANNED' && typedPlan && !typedPlan.is_published && typedPlan.is_successful === false && (
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-xl p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-amber-900 mb-3">Treatment Plan Update</h3>
+                <div className="bg-amber-100 border-l-4 border-amber-500 p-4 rounded mb-4">
+                  <p className="text-amber-900 font-medium mb-2">
+                    Following your recent follow-up reviews, your healthcare team has determined that your treatment plan needs to be revised.
+                  </p>
+                  {typedPlan.outcome_notes && (
+                    <div className="mt-3 pt-3 border-t border-amber-200">
+                      <p className="text-sm text-amber-800">
+                        <span className="font-semibold">Reason:</span> {typedPlan.outcome_notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                  <p className="text-sm text-blue-900">
+                    <strong>Next Steps:</strong>
+                  </p>
+                  <ul className="text-sm text-blue-800 mt-2 space-y-1 list-disc list-inside">
+                    <li>Your previous scans will be reviewed by our medical team</li>
+                    <li>A new, personalized treatment plan will be prepared</li>
+                    <li>You will be notified once the new plan is ready</li>
+                    <li>Our team will guide you through every step of the process</li>
+                  </ul>
+                </div>
+                <p className="text-gray-600 text-sm mt-4">
+                  Please be assured that this is a standard part of comprehensive cancer care. Our dedicated team is committed to providing you with the best possible treatment outcome.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* PHASE 4: COMPLETION (TREATMENT_COMPLETED) */}
-        {typedPatient.current_status === 'TREATMENT_COMPLETED' && (
+        {typedPatient.current_status === 'TREATMENT_COMPLETED' && typedReviews.length === 0 && (
           <TreatmentCertificate
             patientName={typedPatient.full_name}
             treatmentType={typedPlan?.treatment_type || 'Prescribed Treatment'}

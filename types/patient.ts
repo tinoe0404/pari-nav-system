@@ -10,6 +10,11 @@ export type PatientStatus =
   | 'PLAN_READY'
   | 'TREATING'
   | 'TREATMENT_COMPLETED'
+  | 'REVIEW_1_PENDING'
+  | 'REVIEW_2_PENDING'
+  | 'REVIEW_3_PENDING'
+  | 'REVIEWS_COMPLETED'
+  | 'JOURNEY_COMPLETE'
 
 export interface PatientData {
   id: string
@@ -38,6 +43,10 @@ export interface TreatmentPlan {
   prep_instructions: string | null
   side_effects: string[]
   is_published: boolean
+  is_successful: boolean | null
+  outcome_notes: string | null
+  outcome_decided_at: string | null
+  outcome_decided_by: string | null
   created_at: string
   updated_at: string
 }
@@ -52,4 +61,19 @@ export interface RoadmapStep {
   controlledBy: 'patient' | 'admin' | 'auto'
   actionRequired: boolean
   actionLabel?: string
+}
+
+export interface TreatmentReview {
+  id: string
+  patient_id: string
+  treatment_plan_id: string
+  review_number: 1 | 2 | 3
+  review_date: string // ISO date
+  office_location: string
+  is_completed: boolean
+  completed_at: string | null
+  completed_by: string | null
+  review_notes: string | null
+  created_at: string
+  updated_at: string
 }
