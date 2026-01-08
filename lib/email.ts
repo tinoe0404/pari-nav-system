@@ -72,9 +72,27 @@ export async function sendPlanReadyEmail(
     // Create transporter
     const transporter = createEmailTransporter()
 
-    // Ensure clean base URL
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+    // Robust Base URL logic
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL
+
+    if (!baseUrl) {
+      if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      } else if (process.env.VERCEL_URL) {
+        baseUrl = `https://${process.env.VERCEL_URL}`
+      } else {
+        baseUrl = 'http://localhost:3000'
+      }
+    }
+
+    // CRITICAL: Ensure protocol is present
+    if (baseUrl && !baseUrl.startsWith('http')) {
+      baseUrl = `https://${baseUrl}`
+    }
+
+    baseUrl = baseUrl.replace(/\/$/, '')
     const dashboardUrl = `${baseUrl}/dashboard`
+
     console.log('🔗 Generated Plan URL:', dashboardUrl)
 
     // Email content
@@ -220,8 +238,29 @@ export async function sendTreatmentCompletionEmail(
     const transporter = createEmailTransporter()
     const subject = 'Congratulations! Treatment Completed 🎓'
 
-    // Ensure clean base URL without trailing slash
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+    // Robust Base URL logic:
+    // 2. Vercel System URL (automatically set on Vercel)
+    // 3. Localhost fallback
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL
+
+    if (!baseUrl) {
+      if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      } else if (process.env.VERCEL_URL) {
+        baseUrl = `https://${process.env.VERCEL_URL}`
+      } else {
+        baseUrl = 'http://localhost:3000'
+      }
+    }
+
+    // CRITICAL: Ensure protocol is present
+    if (baseUrl && !baseUrl.startsWith('http')) {
+      baseUrl = `https://${baseUrl}`
+    }
+
+    // Strip trailing slash just in case
+    baseUrl = baseUrl.replace(/\/$/, '')
+
     const dashboardUrl = `${baseUrl}/dashboard`
 
     console.log('🔗 Generated Dashboard URL:', dashboardUrl)
