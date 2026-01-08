@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 interface NavLink {
     href: string
@@ -14,16 +14,24 @@ interface MobileNavProps {
     isPatient?: boolean
     isAdmin?: boolean
     onLogout?: () => void
+    adminStatusCounts?: {
+        ALL: number
+        AWAITING_SCAN: number
+        PLANNING_QUEUE: number
+        PLAN_READY: number
+    }
 }
 
-export default function MobileNav({ isPatient = false, isAdmin = false, onLogout }: MobileNavProps) {
+export default function MobileNav({ isPatient = false, isAdmin = false, onLogout, adminStatusCounts }: MobileNavProps) {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
+    const searchParams = useSearchParams()
+    const currentStatus = searchParams.get('status')
 
-    // Close menu when route changes
+    // Close menu when route changes or status changes
     useEffect(() => {
         setIsOpen(false)
-    }, [pathname])
+    }, [pathname, currentStatus])
 
     // Prevent body scroll when menu is open
     useEffect(() => {
@@ -61,10 +69,10 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
     const adminLinks: NavLink[] = [
         {
             href: '/admin/dashboard',
-            label: 'Admin Dashboard',
+            label: 'Dashboard Overview',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
             ),
         },
@@ -106,60 +114,151 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                     }`}
             >
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center shadow-md">
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div>
                             <h2 className="font-bold text-gray-900">Parirenyatwa</h2>
-                            <p className="text-xs text-gray-600">{isAdmin ? 'Admin Portal' : 'Patient Portal'}</p>
+                            <p className="text-xs text-gray-600 font-medium">{isAdmin ? 'Admin Portal' : 'Patient Portal'}</p>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
                         aria-label="Close menu"
                     >
-                        <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="p-4">
-                    <ul className="space-y-2">
+                <nav className="p-4 overflow-y-auto max-h-[calc(100vh-140px)]">
+                    <ul className="space-y-1">
+                        {/* Main Links */}
                         {links.map((link) => {
-                            const isActive = pathname === link.href
+                            const isActive = pathname === link.href && !searchParams.toString()
                             return (
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-                                                ? 'bg-blue-600 text-white shadow-md'
-                                                : 'text-gray-700 hover:bg-gray-100'
+                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-medium ${isActive
+                                            ? 'bg-purple-50 text-purple-700'
+                                            : 'text-gray-700 hover:bg-gray-50'
                                             }`}
-                                        style={{ minHeight: '44px' }}
                                     >
                                         {link.icon}
-                                        <span className="font-medium">{link.label}</span>
+                                        <span>{link.label}</span>
                                     </Link>
                                 </li>
                             )
                         })}
+
+                        {/* Admin Filters - Rendered directly in menu */}
+                        {isAdmin && adminStatusCounts && (
+                            <>
+                                <li className="pt-4 pb-2">
+                                    <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Patient Filters</p>
+                                </li>
+
+                                {/* All Patients */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${!currentStatus
+                                                ? 'bg-purple-100 text-purple-700 font-semibold'
+                                                : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${!currentStatus ? 'bg-purple-500' : 'bg-gray-300'}`} />
+                                            <span>All Patients</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${!currentStatus ? 'bg-white text-purple-700' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.ALL}
+                                        </span>
+                                    </Link>
+                                </li>
+
+                                {/* Awaiting Scan */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard?status=CONSULTATION_COMPLETED"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'CONSULTATION_COMPLETED'
+                                                ? 'bg-orange-100 text-orange-800 font-semibold'
+                                                : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'CONSULTATION_COMPLETED' ? 'bg-orange-500' : 'bg-orange-200'
+                                                }`} />
+                                            <span>Awaiting Scan</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'CONSULTATION_COMPLETED' ? 'bg-white text-orange-800' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.AWAITING_SCAN}
+                                        </span>
+                                    </Link>
+                                </li>
+
+                                {/* Planning Queue */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard?status=SCANNED"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'SCANNED'
+                                                ? 'bg-blue-100 text-blue-800 font-semibold'
+                                                : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'SCANNED' ? 'bg-blue-500' : 'bg-blue-200'
+                                                }`} />
+                                            <span>Planning Queue</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'SCANNED' ? 'bg-white text-blue-800' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.PLANNING_QUEUE}
+                                        </span>
+                                    </Link>
+                                </li>
+
+                                {/* Ready for Treatment */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard?status=PLAN_READY"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'PLAN_READY'
+                                                ? 'bg-green-100 text-green-800 font-semibold'
+                                                : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'PLAN_READY' ? 'bg-green-500' : 'bg-green-200'
+                                                }`} />
+                                            <span>Ready for Treatment</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'PLAN_READY' ? 'bg-white text-green-800' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.PLAN_READY}
+                                        </span>
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                     </ul>
                 </nav>
 
                 {/* Logout Button */}
                 {onLogout && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
                         <button
                             onClick={onLogout}
-                            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-red-50 text-red-700 rounded-lg font-semibold hover:bg-red-100 transition-colors"
-                            style={{ minHeight: '44px' }}
+                            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-all shadow-sm"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

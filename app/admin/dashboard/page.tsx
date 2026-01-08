@@ -133,7 +133,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
           <div className="flex items-center justify-between gap-3">
             {/* Mobile Nav + Title */}
             <div className="flex items-center gap-3">
-              <MobileNav isAdmin onLogout={logout} />
+              <MobileNav isAdmin onLogout={logout} adminStatusCounts={statusCounts} />
               <div>
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Admin Console</h1>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1 hidden sm:block">Parirenyatwa Radiotherapy Department</p>
@@ -192,7 +192,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         )}
 
         {/* Filter Tabs - Mobile Optimized with Horizontal Scroll */}
-        <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden hidden md:block">
           <div className="border-b border-gray-200">
             {/* Scrollable container on mobile */}
             <div className="overflow-x-auto scrollbar-hide">
