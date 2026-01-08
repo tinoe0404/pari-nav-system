@@ -74,7 +74,7 @@ export async function sendPlanReadyEmail(
 
     // Email content
     const subject = 'Update: Radiotherapy Plan Ready'
-    
+
     const htmlBody = `
 <!DOCTYPE html>
 <html lang="en">
@@ -183,14 +183,110 @@ Please do not reply to this email.
 
   } catch (error) {
     console.error('❌ Email sending failed:', error)
-    
-    const errorMessage = error instanceof Error 
-      ? error.message 
+
+    const errorMessage = error instanceof Error
+      ? error.message
       : 'Unknown email error occurred'
 
     return {
       emailSent: false,
       emailError: errorMessage,
+    }
+  }
+}
+
+// ============================================
+// SEND TREATMENT COMPLETION EMAIL
+// ============================================
+
+/**
+ * Sends a congratulations email to the patient when treatment is marked as complete
+ */
+export async function sendTreatmentCompletionEmail(
+  toEmail: string,
+  patientName: string
+): Promise<EmailNotificationResult> {
+  try {
+    // Validate inputs
+    if (!toEmail || !toEmail.includes('@')) {
+      return { emailSent: false, emailError: 'Invalid email address' }
+    }
+
+    const transporter = createEmailTransporter()
+    const subject = 'Congratulations! Treatment Completed 🎓'
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`
+
+    const htmlBody = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fce7f3; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%); padding: 40px 20px; text-align: center; color: white; }
+    .content { padding: 40px 30px; color: #374151; line-height: 1.6; }
+    .button { display: inline-block; background-color: #7c3aed; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+    .footer { background-color: #f9fafb; padding: 20px; text-align: center; color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div style="padding: 40px 0;">
+    <div class="container">
+      <div class="header">
+        <h1 style="margin:0; font-size:28px;">🎉 Treatment Complete!</h1>
+      </div>
+      <div class="content">
+        <h2 style="color: #4b5563; margin-top:0;">Congratulations, ${patientName}!</h2>
+        <p>We are thrilled to inform you that your radiotherapy treatment course has been successfully marked as <strong>Complete</strong>.</p>
+        <p>This is a significant milestone in your journey, and we are proud to have been part of your care team.</p>
+        
+        <div style="background-color: #f3f4f6; border-left: 4px solid #7c3aed; padding: 15px; margin: 20px 0;">
+          <strong>Next Steps:</strong> Please log in to your dashboard to view and download your official <strong>Treatment Completion Certificate</strong>.
+        </div>
+
+        <div style="text-align: center;">
+          <a href="${dashboardUrl}" class="button" style="color: #ffffff;">View My Dashboard</a>
+        </div>
+      </div>
+      <div class="footer">
+        <p>Parirenyatwa Radiotherapy Center<br>Harare, Zimbabwe</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim()
+
+    const textBody = `
+Congratulations ${patientName}!
+
+We are thrilled to inform you that your radiotherapy treatment course has been successfully marked as Complete.
+
+This is a significant milestone in your journey.
+
+Please log in to your dashboard to view and download your official Treatment Completion Certificate:
+${dashboardUrl}
+
+Regards,
+Parirenyatwa Radiotherapy Center
+    `.trim()
+
+    const info = await transporter.sendMail({
+      from: `"Parirenyatwa Health" <${process.env.GMAIL_USER}>`,
+      to: toEmail,
+      subject: subject,
+      text: textBody,
+      html: htmlBody,
+    })
+
+    console.log('✅ Completion email sent:', info.messageId)
+    return { emailSent: true }
+
+  } catch (error) {
+    console.error('❌ Completion email failed:', error)
+    return {
+      emailSent: false,
+      emailError: error instanceof Error ? error.message : 'Unknown error'
     }
   }
 }

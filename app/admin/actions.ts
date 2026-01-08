@@ -4,7 +4,11 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 import { requireAdmin } from '@/utils/auth-helpers'
-import { sendPlanReadyEmail, type EmailNotificationResult } from '@/lib/email'
+import {
+  sendPlanReadyEmail,
+  sendTreatmentCompletionEmail,
+  type EmailNotificationResult
+} from '@/lib/email'
 
 // ============================================
 // TYPE DEFINITIONS
@@ -472,10 +476,10 @@ export async function completeTreatment(
 
     const supabase = await createClient()
 
-    // Step 1: Fetch patient status
+    // Step 1: Fetch patient status and email
     const { data: patient, error: patientError } = await supabase
       .from('patients')
-      .select('id, mrn, current_status')
+      .select('id, mrn, current_status, email, full_name')
       .eq('id', patientId)
       .single()
 
@@ -506,7 +510,20 @@ export async function completeTreatment(
       return { success: false, error: `Failed to update status: ${updateError.message}` }
     }
 
-    // Step 4: Revalidate
+    // Step 4: Send Completion Email (Non-blocking)
+    if (patient.email) {
+      // We don't await this to ensure the UI updates instantly
+      sendTreatmentCompletionEmail(patient.email, patient.full_name)
+        .then((result: EmailNotificationResult) => {
+          if (result.emailSent) console.log(`✅ Completion email sent to ${patient.email}`)
+          else console.error(`❌ Failed to send completion email: ${result.emailError}`)
+        })
+        .catch((err: unknown) => console.error('❌ Unexpected email error:', err))
+    } else {
+      console.warn(`⚠️ No email found for patient ${patient.mrn}, skipping notification`)
+    }
+
+    // Step 5: Revalidate
     revalidatePath('/admin')
     revalidatePath('/admin/dashboard')
     revalidatePath(`/admin/patient/${patientId}`)
