@@ -7,6 +7,7 @@ import { logout } from '@/app/actions/auth'
 import MobileNav from '@/components/MobileNav'
 import PatientCard from '@/components/PatientCard'
 import RealtimeAdminListener from '@/components/RealtimeAdminListener'
+import QRCode from '@/components/QRCode'
 import type { PatientData } from '@/types/patient'
 
 export const dynamic = 'force-dynamic'
@@ -481,6 +482,90 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* QR Code Pamphlet Section */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mt-8">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Patient Portal QR Code</h2>
+                <p className="text-sm text-gray-600 mt-1">Download for pamphlets and print materials</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              {/* QR Code Preview */}
+              <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 border-2 border-dashed border-gray-300">
+                <QRCode
+                  value="https://pari-nav-system.vercel.app/"
+                  size={256}
+                  fgColor="#000000"
+                  bgColor="#FFFFFF"
+                  level="H"
+                  showDownload={true}
+                  downloadFilename="parirenyatwa-navigation-pamphlet"
+                  title="Scan to Navigate Parirenyatwa Hospital"
+                />
+              </div>
+
+              {/* Download Options */}
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-blue-900">Usage Instructions</h3>
+                      <ul className="text-sm text-blue-800 mt-2 space-y-1 list-disc list-inside">
+                        <li>Download the QR code image below</li>
+                        <li>Include it in pamphlets, posters, or signage</li>
+                        <li>Patients scan to access the patient portal</li>
+                        <li>Suitable for both print and digital materials</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Info - Download button now in QR component */}
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-green-900">High Quality QR Code</h3>
+                      <ul className="text-sm text-green-800 mt-2 space-y-1 list-disc list-inside">
+                        <li>Production-ready for printing</li>
+                        <li>High error correction for reliability</li>
+                        <li>Optimized for scanning at any size</li>
+                        <li>Click "Download PNG" above to save</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <p className="text-xs text-gray-600 font-medium">Format</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">PNG Image</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <p className="text-xs text-gray-600 font-medium">Print Ready</p>
+                    <p className="text-sm font-bold text-green-700 mt-1">✓ High Quality</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
