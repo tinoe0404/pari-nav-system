@@ -19,6 +19,7 @@ interface MobileNavProps {
         AWAITING_SCAN: number
         PLANNING_QUEUE: number
         PLAN_READY: number
+        COMPLETED: number
     }
 }
 
@@ -171,8 +172,8 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                     <Link
                                         href="/admin/dashboard"
                                         className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${!currentStatus
-                                                ? 'bg-purple-100 text-purple-700 font-semibold'
-                                                : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-purple-100 text-purple-700 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -191,8 +192,8 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                     <Link
                                         href="/admin/dashboard?status=CONSULTATION_COMPLETED"
                                         className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'CONSULTATION_COMPLETED'
-                                                ? 'bg-orange-100 text-orange-800 font-semibold'
-                                                : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-orange-100 text-orange-800 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -212,8 +213,8 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                     <Link
                                         href="/admin/dashboard?status=SCANNED"
                                         className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'SCANNED'
-                                                ? 'bg-blue-100 text-blue-800 font-semibold'
-                                                : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-blue-100 text-blue-800 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -233,8 +234,8 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                     <Link
                                         href="/admin/dashboard?status=PLAN_READY"
                                         className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'PLAN_READY'
-                                                ? 'bg-green-100 text-green-800 font-semibold'
-                                                : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-green-100 text-green-800 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -245,6 +246,27 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'PLAN_READY' ? 'bg-white text-green-800' : 'bg-gray-100 text-gray-600'
                                             }`}>
                                             {adminStatusCounts.PLAN_READY}
+                                        </span>
+                                    </Link>
+                                </li>
+
+                                {/* Treatment Complete */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard?status=TREATMENT_COMPLETED"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'TREATMENT_COMPLETED'
+                                            ? 'bg-teal-100 text-teal-800 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'TREATMENT_COMPLETED' ? 'bg-teal-500' : 'bg-teal-200'
+                                                }`} />
+                                            <span>Treatment Complete</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'TREATMENT_COMPLETED' ? 'bg-white text-teal-800' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.COMPLETED}
                                         </span>
                                     </Link>
                                 </li>

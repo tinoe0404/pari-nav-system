@@ -77,6 +77,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     AWAITING_SCAN: typedPatients.filter(p => p.current_status === 'CONSULTATION_COMPLETED').length,
     PLANNING_QUEUE: typedPatients.filter(p => p.current_status === 'SCANNED' || p.current_status === 'PLANNING').length,
     PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
+    COMPLETED: typedPatients.filter(p => p.current_status === 'TREATMENT_COMPLETED').length,
   }
 
   const highRiskCount = typedPatients.filter(hasHighRiskCondition).length
@@ -97,6 +98,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         return 'bg-green-100 text-green-800 border-green-300'
       case 'TREATING':
         return 'bg-indigo-100 text-indigo-800 border-indigo-300'
+      case 'TREATMENT_COMPLETED':
+        return 'bg-teal-100 text-teal-800 border-teal-300'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300'
     }
@@ -118,6 +121,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         return 'Plan Ready'
       case 'TREATING':
         return 'Treating'
+      case 'TREATMENT_COMPLETED':
+        return 'Discharged'
       default:
         return status
     }
@@ -253,13 +258,27 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                     </span>
                   </div>
                 </Link>
+                <Link
+                  href="/admin/dashboard?status=TREATMENT_COMPLETED"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'TREATMENT_COMPLETED'
+                    ? 'border-teal-500 text-teal-600 bg-teal-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap text-center">Treatment<br className="sm:hidden" /> Complete</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-teal-100 text-teal-700">
+                      {statusCounts.COMPLETED}
+                    </span>
+                  </div>
+                </Link>
               </nav>
             </div>
-          </div>
-        </div>
+          </div >
+        </div >
 
         {/* Patient Table */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        < div className="bg-white rounded-xl shadow-md overflow-hidden" >
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
               <div>
@@ -267,7 +286,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                   {activeFilter === 'ALL' && 'All Patients'}
                   {activeFilter === 'CONSULTATION_COMPLETED' && 'Patients Awaiting Scan'}
                   {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
+                  {activeFilter === 'CONSULTATION_COMPLETED' && 'Patients Awaiting Scan'}
+                  {activeFilter === 'SCANNED' && 'Patients in Planning Queue'}
                   {activeFilter === 'PLAN_READY' && 'Patients Ready for Treatment'}
+                  {activeFilter === 'TREATMENT_COMPLETED' && 'Discharged Patients'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {typedPatients.length === 0 ? 'No patients found' : `${typedPatients.length} patient${typedPatients.length !== 1 ? 's' : ''}`}
@@ -285,154 +307,156 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          {typedPatients.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
+          {
+            typedPatients.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 font-medium">No patients in this category</p>
+                <p className="text-sm text-gray-500 mt-1">Patients will appear here once they complete registration</p>
               </div>
-              <p className="text-gray-600 font-medium">No patients in this category</p>
-              <p className="text-sm text-gray-500 mt-1">Patients will appear here once they complete registration</p>
-            </div>
-          ) : (
-            <>
-              {/* Desktop Table View - Hidden on mobile */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Patient
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        MRN
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Admission Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Risk Level
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {typedPatients.map((patient) => {
-                      const isHighRisk = hasHighRiskCondition(patient)
+            ) : (
+              <>
+                {/* Desktop Table View - Hidden on mobile */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Patient
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          MRN
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Admission Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Risk Level
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {typedPatients.map((patient) => {
+                        const isHighRisk = hasHighRiskCondition(patient)
 
-                      return (
-                        <tr
-                          key={patient.id}
-                          className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
-                                }`}>
-                                <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
-                                  {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                </span>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-semibold text-gray-900">
-                                  {patient.full_name}
+                        return (
+                          <tr
+                            key={patient.id}
+                            className={`hover:bg-gray-50 transition-colors ${isHighRisk ? 'bg-red-50/30' : ''}`}
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isHighRisk ? 'bg-red-100 ring-2 ring-red-300' : 'bg-purple-100'
+                                  }`}>
+                                  <span className={`font-bold text-sm ${isHighRisk ? 'text-red-700' : 'text-purple-700'}`}>
+                                    {patient.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                  </span>
                                 </div>
-                                <div className="text-xs text-gray-500">
-                                  DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-mono font-bold text-purple-700">
-                              {patient.mrn}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900">
-                              {new Date(patient.admission_date).toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                              })}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
-                              {getStatusLabel(patient.current_status)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center justify-center">
-                              {isHighRisk ? (
-                                <div className="flex flex-col items-center gap-1">
-                                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse">
-                                    <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
+                                <div className="ml-4">
+                                  <div className="text-sm font-semibold text-gray-900">
+                                    {patient.full_name}
                                   </div>
-                                  <span className="text-xs font-bold text-red-800 uppercase">High</span>
-                                </div>
-                              ) : (
-                                <div className="flex flex-col items-center gap-1">
-                                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
-                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
+                                  <div className="text-xs text-gray-500">
+                                    DOB: {new Date(patient.dob).toLocaleDateString('en-GB')}
                                   </div>
-                                  <span className="text-xs font-medium text-green-800">Standard</span>
                                 </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <Link
-                              href={`/admin/patient/${patient.id}`}
-                              className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
-                                ? 'bg-red-600 hover:bg-red-700'
-                                : 'bg-purple-500 hover:bg-purple-600'
-                                }`}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                              </svg>
-                              {isHighRisk ? 'Review (⚠️ Risk)' : 'Manage'}
-                            </Link>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="text-sm font-mono font-bold text-purple-700">
+                                {patient.mrn}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="text-sm text-gray-900">
+                                {new Date(patient.admission_date).toLocaleDateString('en-GB', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeColor(patient.current_status)}`}>
+                                {getStatusLabel(patient.current_status)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center justify-center">
+                                {isHighRisk ? (
+                                  <div className="flex flex-col items-center gap-1">
+                                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-400 animate-pulse">
+                                      <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-xs font-bold text-red-800 uppercase">High</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center gap-1">
+                                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center border-2 border-green-300">
+                                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-xs font-medium text-green-800">Standard</span>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <Link
+                                href={`/admin/patient/${patient.id}`}
+                                className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
+                                  ? 'bg-red-600 hover:bg-red-700'
+                                  : 'bg-purple-500 hover:bg-purple-600'
+                                  }`}
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                                </svg>
+                                {isHighRisk ? 'Review (⚠️ Risk)' : 'Manage'}
+                              </Link>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
 
-              {/* Mobile Card View - Visible only on mobile */}
-              <div className="md:hidden space-y-4 p-4">
-                {typedPatients.map((patient) => {
-                  const isHighRisk = hasHighRiskCondition(patient)
-                  return (
-                    <PatientCard
-                      key={patient.id}
-                      patient={patient}
-                      isHighRisk={isHighRisk}
-                      statusBadgeColor={getStatusBadgeColor(patient.current_status)}
-                      statusLabel={getStatusLabel(patient.current_status)}
-                    />
-                  )
-                })}
-              </div>
-            </>
-          )}
-        </div>
+                {/* Mobile Card View - Visible only on mobile */}
+                <div className="md:hidden space-y-4 p-4">
+                  {typedPatients.map((patient) => {
+                    const isHighRisk = hasHighRiskCondition(patient)
+                    return (
+                      <PatientCard
+                        key={patient.id}
+                        patient={patient}
+                        isHighRisk={isHighRisk}
+                        statusBadgeColor={getStatusBadgeColor(patient.current_status)}
+                        statusLabel={getStatusLabel(patient.current_status)}
+                      />
+                    )
+                  })}
+                </div>
+              </>
+            )
+          }
+        </div >
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mt-8">
+        < div className="grid md:grid-cols-5 gap-4 mt-8" >
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -488,10 +512,24 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               </div>
             </div>
           </div>
-        </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Discharged</p>
+                <p className="text-3xl font-bold text-teal-600 mt-2">{statusCounts.COMPLETED}</p>
+              </div>
+              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div >
 
         {/* QR Code Pamphlet Section */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mt-8">
+        < div className="bg-white rounded-xl shadow-md overflow-hidden mt-8" >
           <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
@@ -572,8 +610,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </div >
+      </main >
+    </div >
   )
 }
