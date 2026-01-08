@@ -191,67 +191,70 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
           </div>
         )}
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Mobile Optimized with Horizontal Scroll */}
         <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
           <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
-              <Link
-                href="/admin/dashboard"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'ALL'
-                  ? 'border-purple-600 text-purple-600 bg-purple-50'
-                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <span>All Patients</span>
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-purple-100 text-purple-800">
-                    {statusCounts.ALL}
-                  </span>
-                </div>
-              </Link>
-              <Link
-                href="/admin/dashboard?status=CONSULTATION_COMPLETED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'CONSULTATION_COMPLETED'
-                  ? 'border-orange-600 text-orange-600 bg-orange-50'
-                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <span>Awaiting Scan</span>
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
-                    {statusCounts.AWAITING_SCAN}
-                  </span>
-                </div>
-              </Link>
-              <Link
-                href="/admin/dashboard?status=SCANNED"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'SCANNED' || activeFilter === 'PLANNING'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50'
-                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <span>Planning Queue</span>
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                    {statusCounts.PLANNING_QUEUE}
-                  </span>
-                </div>
-              </Link>
-              <Link
-                href="/admin/dashboard?status=PLAN_READY"
-                className={`flex-1 py-4 px-6 text-center text-sm font-semibold border-b-2 transition-all ${activeFilter === 'PLAN_READY'
-                  ? 'border-green-600 text-green-600 bg-green-50'
-                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <span>Ready for Treatment</span>
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold rounded-full bg-green-100 text-green-800">
-                    {statusCounts.PLAN_READY}
-                  </span>
-                </div>
-              </Link>
-            </nav>
+            {/* Scrollable container on mobile */}
+            <div className="overflow-x-auto scrollbar-hide">
+              <nav className="flex -mb-px min-w-max md:min-w-0">
+                <Link
+                  href="/admin/dashboard"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'ALL'
+                    ? 'border-purple-400 text-purple-600 bg-purple-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap">All Patients</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-purple-100 text-purple-700">
+                      {statusCounts.ALL}
+                    </span>
+                  </div>
+                </Link>
+                <Link
+                  href="/admin/dashboard?status=CONSULTATION_COMPLETED"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'CONSULTATION_COMPLETED'
+                    ? 'border-orange-500 text-orange-600 bg-orange-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap">Awaiting Scan</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-orange-100 text-orange-700">
+                      {statusCounts.AWAITING_SCAN}
+                    </span>
+                  </div>
+                </Link>
+                <Link
+                  href="/admin/dashboard?status=SCANNED"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'SCANNED' || activeFilter === 'PLANNING'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap">Planning Queue</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
+                      {statusCounts.PLANNING_QUEUE}
+                    </span>
+                  </div>
+                </Link>
+                <Link
+                  href="/admin/dashboard?status=PLAN_READY"
+                  className={`flex-shrink-0 md:flex-1 py-3 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold border-b-2 transition-all min-h-[60px] flex items-center justify-center ${activeFilter === 'PLAN_READY'
+                    ? 'border-green-500 text-green-600 bg-green-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                    <span className="whitespace-nowrap text-center">Ready for<br className="sm:hidden" /> Treatment</span>
+                    <span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[24px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold rounded-full bg-green-100 text-green-700">
+                      {statusCounts.PLAN_READY}
+                    </span>
+                  </div>
+                </Link>
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -393,7 +396,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                               href={`/admin/patient/${patient.id}`}
                               className={`inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all shadow-sm hover:shadow-md ${isHighRisk
                                 ? 'bg-red-600 hover:bg-red-700'
-                                : 'bg-purple-600 hover:bg-purple-700'
+                                : 'bg-purple-500 hover:bg-purple-600'
                                 }`}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,7 +440,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
                 <p className="text-3xl font-bold text-gray-900 mt-2">{statusCounts.ALL}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>

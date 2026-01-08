@@ -64,7 +64,7 @@ export default function Roadmap({
   const getControlIndicator = (controlledBy: 'patient' | 'admin' | 'auto') => {
     if (controlledBy === 'patient') {
       return (
-        <div className="flex items-center gap-1 text-xs text-indigo-700 font-medium">
+        <div className="flex items-center gap-1 text-xs text-purple-600 font-medium">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
           </svg>
@@ -143,17 +143,17 @@ export default function Roadmap({
 
           {/* Step Card */}
           <div
-            className={`relative flex flex-col gap-4 p-6 rounded-2xl transition-all duration-500 ${step.status === 'completed'
+            className={`relative flex flex-col gap-4 p-4 sm:p-6 rounded-2xl transition-all duration-500 ${step.status === 'completed'
               ? 'bg-green-50 border-2 border-green-200'
               : step.status === 'active'
-                ? 'bg-gradient-to-br from-indigo-50 to-indigo-100 border-2 border-indigo-400 shadow-xl shadow-indigo-200 scale-105'
+                ? 'bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-400 shadow-xl shadow-purple-200/50 scale-105'
                 : 'bg-gray-50 border-2 border-gray-200 opacity-60'
               }`}
           >
             {/* Current Step Badge */}
             {step.status === 'active' && (
               <div className="absolute -top-3 left-6">
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white shadow-lg animate-pulse">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-purple-500 text-white shadow-lg animate-pulse">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
@@ -165,10 +165,10 @@ export default function Roadmap({
             <div className="flex gap-4">
               {/* Icon Circle */}
               <div
-                className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 ${step.status === 'completed'
+                className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 ${step.status === 'completed'
                   ? 'bg-green-500 shadow-lg shadow-green-300'
                   : step.status === 'active'
-                    ? 'bg-white border-4 border-indigo-600 shadow-xl shadow-indigo-300'
+                    ? 'bg-white border-4 border-purple-500 shadow-xl shadow-purple-300/50'
                     : 'bg-gray-300'
                   }`}
               >
@@ -183,10 +183,10 @@ export default function Roadmap({
               <div className="flex-1 min-w-0 mt-1">
                 {/* Step Label */}
                 <h3
-                  className={`text-xl font-bold mb-1 transition-colors ${step.status === 'completed'
+                  className={`text-lg sm:text-xl font-bold mb-1 transition-colors ${step.status === 'completed'
                     ? 'text-green-900'
                     : step.status === 'active'
-                      ? 'text-indigo-900'
+                      ? 'text-purple-900'
                       : 'text-gray-500'
                     }`}
                 >
@@ -218,7 +218,7 @@ export default function Roadmap({
                   </span>
                 )}
                 {step.status === 'active' && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-purple-500 text-white">
                     Active
                   </span>
                 )}

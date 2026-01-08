@@ -298,7 +298,7 @@ export default async function PatientDashboard({
         {typedPlan &&
           typedPatient.current_status !== 'PLAN_READY' &&
           typedPatient.current_status !== 'TREATING' && (
-            <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white mb-8">
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white mb-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                   <svg
@@ -317,7 +317,7 @@ export default async function PatientDashboard({
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Your Treatment Plan</h3>
-                  <p className="text-purple-200 text-sm">Ready to begin</p>
+                  <p className="text-purple-100 text-sm">Ready to begin</p>
                 </div>
               </div>
 
