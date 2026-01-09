@@ -314,6 +314,36 @@ export default async function PatientDashboard({
           )}
 
         {/* ============================================ */}
+        {/* WAITING FOR REVIEWS: Treatment Complete but Reviews not yet scheduled */}
+        {/* ============================================ */}
+        {typedPatient.current_status === 'TREATMENT_COMPLETED' && typedReviews.length === 0 && (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl shadow-xl p-6 mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-blue-900">Awaiting Review Plan</h3>
+                <p className="text-blue-700 text-sm">Doctor is preparing your schedule</p>
+              </div>
+            </div>
+
+            <div className="bg-white/60 rounded-xl p-6 border border-blue-100">
+              <p className="text-blue-900 font-medium mb-2">
+                Your treatment has been marked as complete.
+              </p>
+              <p className="text-blue-800 text-sm leading-relaxed">
+                Your healthcare team is currently finalizing your follow-up review schedule.
+                You will receive an email notification as soon as your review dates are ready.
+                Please check back shortly.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================ */}
         {/* REVIEW SCHEDULE: Show when in review status */}
         {/* ============================================ */}
         {['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'TREATMENT_COMPLETED'].includes(typedPatient.current_status) && typedReviews.length > 0 && (

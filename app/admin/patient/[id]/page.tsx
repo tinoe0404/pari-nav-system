@@ -8,7 +8,8 @@ import {
   schedulePostTreatmentReviews,
   markReviewComplete,
   finalizeTreatmentSuccess,
-  restartTreatment
+  restartTreatment,
+  markTreatmentComplete
 } from '@/app/admin/review-actions'
 import MobileNav from '@/components/MobileNav'
 import { logout } from '@/app/actions/auth'
@@ -687,8 +688,49 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             )}
 
-            {/* SCHEDULE REVIEWS: For TREATING or PLAN_READY status */}
-            {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATMENT_COMPLETED') && typedReviews.length === 0 && (
+            {/* STEP 1: MARK TREATMENT COMPLETE (New) */}
+            {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY') && typedReviews.length === 0 && (
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md p-6 mb-6">
+                <h2 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Treatment Complete?
+                </h2>
+
+                <div className="mb-6 bg-green-100/50 border-l-4 border-green-500 p-4 rounded">
+                  <p className="text-sm text-green-900 font-medium">
+                    Has the patient finished their full course of radiotherapy?
+                  </p>
+                  <p className="text-sm text-green-800 mt-2">
+                    Clicking "Confirm Completion" will:
+                  </p>
+                  <ul className="list-disc list-inside text-xs text-green-800 ml-2 mt-1 space-y-1">
+                    <li>Mark the patient status as <strong>Treatment Completed</strong></li>
+                    <li>Send a <strong>"Treatment Successful"</strong> email to the patient</li>
+                    <li>Unlock the <strong>Review Scheduling</strong> form below</li>
+                  </ul>
+                </div>
+
+                <form action={async () => {
+                  'use server'
+                  await markTreatmentComplete(id)
+                }}>
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    Confirm Treatment Completion
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* STEP 2: SCHEDULE REVIEWS (Only after treatment is marked complete) */}
+            {typedPatient.current_status === 'TREATMENT_COMPLETED' && typedReviews.length === 0 && (
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md p-6 mb-6">
                 <h2 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -699,7 +741,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
                 <div className="mb-6 bg-blue-100/50 border-l-4 border-blue-500 p-4 rounded">
                   <p className="text-sm text-blue-900 font-medium">
-                    After treatment completion, schedule 3 follow-up review appointments to monitor the patient's recovery and determine treatment outcome.
+                    Treatment is confirmed complete. Now schedule 3 follow-up review appointments to monitor the patient's recovery.
                   </p>
                 </div>
 

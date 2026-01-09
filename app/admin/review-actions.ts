@@ -10,8 +10,74 @@ import {
     sendTreatmentRestartEmail,
     sendReviewCompletionEmail
 } from '@/lib/email-reviews'
+import { sendTreatmentCompletionEmail } from '@/lib/email'
 import type { EmailNotificationResult } from '@/lib/email'
 import type { ActionResponse, ScheduleReviewsInput } from './actions'
+
+// ============================================
+// MARK TREATMENT COMPLETE (NEW STEP 1)
+// ============================================
+
+/**
+ * Marks the treatment phase as complete and notifies the patient.
+ * This unlocks the review scheduling phase.
+ */
+export async function markTreatmentComplete(patientId: string): Promise<ActionResponse> {
+    try {
+        await requireAdmin()
+
+        if (!patientId?.trim()) {
+            return { success: false, error: 'Patient ID is required' }
+        }
+
+        const supabase = await createClient()
+
+        // Update patient status to TREATMENT_COMPLETED
+        const { error: updateError } = await supabase
+            .from('patients')
+            .update({
+                current_status: 'TREATMENT_COMPLETED',
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', patientId)
+
+        if (updateError) {
+            console.error('Error updating patient status:', updateError)
+            return { success: false, error: `Failed to update status: ${updateError.message}` }
+        }
+
+        // Send email notification (non-blocking)
+        const { data: patient } = await supabase
+            .from('patients')
+            .select('email, full_name')
+            .eq('id', patientId)
+            .single()
+
+        if (patient && patient.email) {
+            sendTreatmentCompletionEmail(patient.email, patient.full_name)
+                .then(result => {
+                    if (result.emailSent) console.log(`✅ Treatment completion email sent to ${patient.email}`)
+                    else console.error(`❌ Failed to send treatment completion email: ${result.emailError}`)
+                })
+                .catch(err => console.error('❌ Unexpected email error:', err))
+        }
+
+        // Revalidate paths
+        revalidatePath('/admin')
+        revalidatePath('/admin/dashboard')
+        revalidatePath(`/admin/patient/${patientId}`)
+        revalidatePath('/dashboard')
+
+        return { success: true }
+
+    } catch (error) {
+        console.error('markTreatmentComplete error:', error)
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'An unexpected error occurred'
+        }
+    }
+}
 
 // ============================================
 // 1. SCHEDULE POST-TREATMENT REVIEWS
