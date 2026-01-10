@@ -186,11 +186,20 @@ export function useAllPatientsRealtime() {
                         router.refresh()
                     }
                 )
-                .subscribe((status) => {
+                .subscribe((status, err) => {
+                    console.log('📡 [DEBUG] Subscription status:', status)
+                    if (err) {
+                        console.error('📡 [DEBUG] Subscription error details:', err)
+                    }
                     if (status === 'SUBSCRIBED') {
                         console.log('✅ Admin subscribed to all patient updates')
                     } else if (status === 'CHANNEL_ERROR') {
                         console.error('❌ Failed to subscribe to all patient updates. Verify Admin RLS.')
+                        console.error('📡 Error details:', err)
+                    } else if (status === 'TIMED_OUT') {
+                        console.error('⏱️ Subscription timed out')
+                    } else if (status === 'CLOSED') {
+                        console.log('🔌 Subscription closed')
                     }
                 })
         }
@@ -202,9 +211,13 @@ export function useAllPatientsRealtime() {
             }
         })
 
-        subscribe()
+        // Small delay on initial mount to let RLS policies settle
+        const timer = setTimeout(() => {
+            subscribe()
+        }, 500)
 
         return () => {
+            clearTimeout(timer)
             if (channel) {
                 console.log('🔌 Admin unsubscribing from all patient updates')
                 supabase.removeChannel(channel)
