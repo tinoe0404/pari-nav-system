@@ -19,6 +19,7 @@ interface MobileNavProps {
         AWAITING_SCAN: number
         PLANNING_QUEUE: number
         PLAN_READY: number
+        IN_REVIEWS: number
         COMPLETED: number
     }
 }
@@ -250,21 +251,42 @@ export default function MobileNav({ isPatient = false, isAdmin = false, onLogout
                                     </Link>
                                 </li>
 
-                                {/* Treatment Complete */}
+                                {/* In Reviews */}
                                 <li>
                                     <Link
-                                        href="/admin/dashboard?status=TREATMENT_COMPLETED"
-                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'TREATMENT_COMPLETED'
+                                        href="/admin/dashboard?status=IN_REVIEWS"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'IN_REVIEWS'
+                                            ? 'bg-amber-100 text-amber-800 font-semibold'
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'IN_REVIEWS' ? 'bg-amber-500' : 'bg-amber-200'
+                                                }`} />
+                                            <span>In Reviews</span>
+                                        </div>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'IN_REVIEWS' ? 'bg-white text-amber-800' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {adminStatusCounts.IN_REVIEWS}
+                                        </span>
+                                    </Link>
+                                </li>
+
+                                {/* Discharged */}
+                                <li>
+                                    <Link
+                                        href="/admin/dashboard?status=DISCHARGED_GROUP"
+                                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${currentStatus === 'DISCHARGED_GROUP' || currentStatus === 'TREATMENT_COMPLETED'
                                             ? 'bg-teal-100 text-teal-800 font-semibold'
                                             : 'text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'TREATMENT_COMPLETED' ? 'bg-teal-500' : 'bg-teal-200'
+                                            <div className={`w-2 h-2 rounded-full ${currentStatus === 'DISCHARGED_GROUP' || currentStatus === 'TREATMENT_COMPLETED' ? 'bg-teal-500' : 'bg-teal-200'
                                                 }`} />
-                                            <span>Treatment Complete</span>
+                                            <span>Discharged</span>
                                         </div>
-                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'TREATMENT_COMPLETED' ? 'bg-white text-teal-800' : 'bg-gray-100 text-gray-600'
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${currentStatus === 'DISCHARGED_GROUP' || currentStatus === 'TREATMENT_COMPLETED' ? 'bg-white text-teal-800' : 'bg-gray-100 text-gray-600'
                                             }`}>
                                             {adminStatusCounts.COMPLETED}
                                         </span>

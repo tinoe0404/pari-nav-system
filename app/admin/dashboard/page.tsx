@@ -66,15 +66,12 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   const typedPatients = (patients || []) as PatientData[]
 
   // Helper function to check for HIGH-RISK conditions
+  // Note: Conditions checklist was removed in intake form refactor
+  // High-risk assessment now relies on scan details (metal implants, etc.)
   const hasHighRiskCondition = (patient: PatientData): boolean => {
-    if (!patient.medical_history) return false
-    const conditions = patient.medical_history.conditions
-    return !!(
-      conditions?.pacemaker ||
-      conditions?.metalImplants ||
-      conditions?.pregnant ||
-      conditions?.claustrophobia
-    )
+    // For now, return false since we don't have the conditions checklist
+    // This can be re-implemented using scan_logs if needed
+    return false
   }
 
   // Count patients by status
