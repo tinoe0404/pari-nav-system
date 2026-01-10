@@ -89,12 +89,12 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                     </div>
                 </div>
 
-                {/* Medical History */}
+                {/* Clinical Information */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                             <svg
-                                className="w-6 h-6 text-red-600"
+                                className="w-6 h-6 text-blue-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -108,57 +108,34 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                             </svg>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-gray-900">Medical History</h3>
-                            <p className="text-sm text-gray-600">Conditions reported</p>
+                            <h3 className="text-xl font-bold text-gray-900">Clinical Information</h3>
+                            <p className="text-sm text-gray-600">Diagnosis and Referrals</p>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        {[
-                            { key: 'pacemaker', label: 'Pacemaker or ICD' },
-                            { key: 'previousRadiation', label: 'Previous Radiation Therapy' },
-                            { key: 'claustrophobia', label: 'Claustrophobia' },
-                            { key: 'metalImplants', label: 'Metal Implants' },
-                            { key: 'diabetes', label: 'Diabetes' },
-                            { key: 'heartDisease', label: 'Heart Disease' },
-                            { key: 'kidneyDisease', label: 'Kidney Disease' },
-                            { key: 'pregnant', label: 'Pregnant or Possibly Pregnant' },
-                            { key: 'allergies', label: 'Allergies' },
-                        ].map((condition) => {
-                            const hasCondition = medicalHistory?.conditions?.[condition.key as keyof typeof medicalHistory.conditions]
-                            return (
-                                <div
-                                    key={condition.key}
-                                    className={`flex items-center gap-3 p-3 rounded-lg ${hasCondition ? 'bg-red-50 border-2 border-red-200' : 'bg-gray-50 border-2 border-gray-200'
-                                        }`}
-                                >
-                                    <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${hasCondition ? 'bg-red-500' : 'bg-gray-300'
-                                        }`}>
-                                        {hasCondition && (
-                                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <span className={`text-sm font-medium ${hasCondition ? 'text-red-900' : 'text-gray-500'
-                                        }`}>
-                                        {condition.label}
-                                    </span>
+                    <div className="space-y-4">
+                        <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4">
+                            <p className="text-xs text-gray-600 mb-1 font-bold uppercase tracking-wider">Primary Diagnosis</p>
+                            <p className="text-lg font-semibold text-gray-900">{medicalHistory?.diagnosis}</p>
+                        </div>
+
+                        <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4">
+                            <p className="text-xs text-gray-600 mb-1 font-bold uppercase tracking-wider">Referring Physician</p>
+                            <p className="text-lg font-semibold text-gray-900">{medicalHistory?.referringPhysician}</p>
+                        </div>
+
+                        {medicalHistory?.allergyDetails && (
+                            <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <h4 className="text-sm font-bold text-amber-900">Allergy Details:</h4>
                                 </div>
-                            )
-                        })}
+                                <p className="text-sm text-amber-800 font-medium">{medicalHistory.allergyDetails}</p>
+                            </div>
+                        )}
                     </div>
-
-                    {medicalHistory?.conditions?.allergies && medicalHistory?.allergyDetails && (
-                        <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
-                            <h4 className="text-sm font-bold text-amber-900 mb-2">Allergy Details:</h4>
-                            <p className="text-sm text-amber-800">{medicalHistory.allergyDetails}</p>
-                        </div>
-                    )}
                 </div>
 
                 {/* Current Symptoms */}
