@@ -52,7 +52,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
             {/* Main Content */}
             <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* BLOCKING MESSAGE */}
-                <div className="bg-red-50 border-4 border-red-300 rounded-2xl shadow-xl p-8 mb-8">
+                <div className="bg-red-50 border-4 border-red-300 rounded-2xl shadow-xl p-6 sm:p-8 mb-8">
                     <div className="flex items-start gap-4">
                         <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <svg
@@ -138,7 +138,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                 {/* Form */}
                 <form action={handleSubmit} className="space-y-8">
                     {/* Section 1: Patient Details */}
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 2: Employment */}
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +285,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 3: Next of Kin */}
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +358,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 4: Clinical Information */}
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,7 +461,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 6: Additional Information */}
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
                         <h3 className="text-lg font-bold text-gray-900 mb-3">Additional Information</h3>
                         <textarea
                             name="additionalNotes"
