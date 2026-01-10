@@ -1,0 +1,12 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   app/admin/patient/[id]/page.tsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	diff_output.txt
+	status_output.txt
+

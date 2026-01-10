@@ -12,6 +12,16 @@ WHERE schemaname = 'public'
 AND tablename IN ('patients', 'treatment_plans', 'treatment_reviews', 'profiles')
 ORDER BY tablename;
 
+-- 1b. Check Replica Identity (Crucial for UPDATE events)
+SELECT 
+    relname as tablename,
+    relreplident as replica_identity
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+AND c.relname IN ('patients', 'treatment_plans', 'treatment_reviews');
+-- d = default (pk), n = nothing, f = full, i = index
+
 -- 2. Check realtime publication
 SELECT 
     schemaname,
