@@ -17,7 +17,7 @@ export default function Phase2HeroCard() {
 
       <div className="bg-white rounded-3xl shadow-xl border border-blue-100 overflow-hidden">
         {/* Card Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 sm:p-8 text-white">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 sm:p-6 lg:p-8 text-white">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">
@@ -55,8 +55,8 @@ export default function Phase2HeroCard() {
         </div>
 
         {/* Card Body */}
-        <div className="p-6 sm:p-8">
-          <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+        <div className="p-4 sm:p-6 lg:p-8">
+          <div className="bg-blue-50 rounded-2xl p-4 sm:p-6 border border-blue-100">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0 text-blue-500">
                 <span className="text-2xl font-bold">5-7</span>

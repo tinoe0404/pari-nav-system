@@ -56,7 +56,7 @@ export default function PatientCard({
             <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
                     <p className="text-xs text-gray-600 font-medium">MRN</p>
-                    <p className="text-sm font-mono font-bold text-purple-600"></ p>
+                    <p className="text-sm font-mono font-bold text-purple-600">{patient.mrn}</p>
                 </div>
                 <div>
                     <p className="text-xs text-gray-600 font-medium">Admission</p>

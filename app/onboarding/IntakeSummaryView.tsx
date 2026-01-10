@@ -57,7 +57,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
             {/* Main Content */}
             <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Success Banner */}
-                <div className="bg-green-50 border-2 border-green-300 rounded-2xl shadow-lg p-6 mb-8">
+                <div className="bg-green-50 border-2 border-green-300 rounded-2xl shadow-lg p-4 sm:p-6 mb-8">
                     <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <svg
@@ -90,7 +90,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                 </div>
 
                 {/* Clinical Information */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                             <svg
@@ -139,7 +139,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                 </div>
 
                 {/* Current Symptoms */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                             <svg
@@ -166,7 +166,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                 </div>
 
                 {/* Mobility Status */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                             <svg
@@ -195,7 +195,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
                 </div>
 
                 {/* Next of Kin */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                             <svg
@@ -238,7 +238,7 @@ export default function IntakeSummaryView({ patient }: IntakeSummaryViewProps) {
 
                 {/* Additional Notes */}
                 {medicalHistory?.additionalNotes && (
-                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                                 <svg

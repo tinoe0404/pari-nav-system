@@ -273,7 +273,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Success/Error Messages */}
         {success && (
           <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4 animate-fade-in">
@@ -302,7 +302,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
           {/* LEFT COLUMN: Patient Context */}
           <div className="space-y-6">
             {/* Patient Info Card */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -343,7 +343,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* Medical History Card */}
             {medicalHistory && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -405,7 +405,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
           <div className="space-y-6">
             {/* AWAITING SCAN: Scan Form (Accepts REGISTERED or CONSULTATION_COMPLETED) */}
             {(typedPatient.current_status === 'REGISTERED' || typedPatient.current_status === 'CONSULTATION_COMPLETED') && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
@@ -539,7 +539,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* SCANNED: Planning CTA */}
             {typedPatient.current_status === 'SCANNED' && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -565,7 +565,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* PLAN_READY/TREATING: Show Published Plan */}
             {(typedPatient.current_status === 'PLAN_READY' || typedPatient.current_status === 'TREATING') && treatmentPlan && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -673,7 +673,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* STEP 1: MARK TREATMENT COMPLETE (New) */}
             {(typedPatient.current_status === 'TREATING' || typedPatient.current_status === 'PLAN_READY') && typedReviews.length === 0 && (
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md p-6 mb-6">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md p-4 sm:p-6 mb-6">
                 <h2 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -714,7 +714,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* STEP 2: SCHEDULE REVIEWS (Only after treatment is marked complete) */}
             {typedPatient.current_status === 'TREATMENT_COMPLETED' && typedReviews.length === 0 && (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md p-6 mb-6">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md p-4 sm:p-6 mb-6">
                 <h2 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -730,7 +730,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
                 <form action={handleScheduleReviews} className="space-y-6">
                   {[1, 2, 3].map(num => (
-                    <div key={num} className="bg-white border-2 border-blue-200 rounded-lg p-5">
+                    <div key={num} className="bg-white border-2 border-blue-200 rounded-lg p-4 sm:p-5">
                       <h3 className="text-md font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                           {num}
@@ -748,7 +748,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                             name={`review${num}Date`}
                             required
                             min={new Date().toISOString().split('T')[0]}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none appearance-none"
                           />
                         </div>
 
@@ -761,7 +761,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                             name={`review${num}Office`}
                             required
                             placeholder="e.g., Oncology Clinic Room 3"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none appearance-none"
                           />
                         </div>
                       </div>

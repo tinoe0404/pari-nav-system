@@ -70,13 +70,13 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                             </svg>
                         </div>
                         <div className="flex-1">
-                            <h2 className="text-3xl font-bold text-red-900 mb-3">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-red-900 mb-3">
                                 Help us treat you safely.
                             </h2>
-                            <p className="text-xl text-red-800 font-semibold mb-2">
+                            <p className="text-lg sm:text-xl text-red-800 font-semibold mb-2">
                                 Please fill out your history.
                             </p>
-                            <p className="text-base text-red-700 leading-relaxed">
+                            <p className="text-sm sm:base text-red-700 leading-relaxed">
                                 Before you can access your dashboard, we need to collect your medical history.
                                 This information is essential for our team to provide you with safe and effective treatment.
                                 All information is confidential and will only be used for your care.
@@ -138,7 +138,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                 {/* Form */}
                 <form action={handleSubmit} className="space-y-8">
                     {/* Section 1: Patient Details */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 2: Employment */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +285,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 3: Next of Kin */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +358,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 4: Clinical Information */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,7 +461,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 6: Additional Information */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                         <h3 className="text-lg font-bold text-gray-900 mb-3">Additional Information</h3>
                         <textarea
                             name="additionalNotes"
@@ -473,7 +473,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                     </div>
 
                     {/* Section 6: Consent */}
-                    <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
+                    <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 sm:p-6">
                         <div className="flex items-start gap-4">
                             <input
                                 type="checkbox"

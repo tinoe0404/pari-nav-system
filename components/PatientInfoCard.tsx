@@ -8,7 +8,7 @@ interface PatientInfoCardProps {
 
 export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
   return (
-    <div className="bg-gradient-to-br from-violet-50 to-indigo-100 rounded-2xl shadow-lg border border-violet-200 p-6">
+    <div className="bg-gradient-to-br from-violet-50 to-indigo-100 rounded-2xl shadow-lg border border-violet-200 p-4 sm:p-6">
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-violet-600 text-sm font-medium mb-1">Patient ID</p>

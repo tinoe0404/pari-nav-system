@@ -44,9 +44,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
   if (statusFilter && statusFilter !== 'ALL') {
     if (statusFilter === 'IN_REVIEWS') {
-      query = query.in('current_status', ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'])
+      query = query.in('current_status', ['TREATMENT_COMPLETED', 'REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'])
     } else if (statusFilter === 'DISCHARGED_GROUP') {
-      query = query.in('current_status', ['TREATMENT_COMPLETED', 'JOURNEY_COMPLETE'])
+      query = query.eq('current_status', 'JOURNEY_COMPLETE')
+    } else if (statusFilter === 'PLAN_READY') {
+      query = query.in('current_status', ['PLAN_READY', 'TREATING'])
     } else {
       query = query.eq('current_status', statusFilter)
     }
@@ -79,9 +81,9 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     ALL: typedPatients.length,
     AWAITING_SCAN: typedPatients.filter(p => p.current_status === 'CONSULTATION_COMPLETED').length,
     PLANNING_QUEUE: typedPatients.filter(p => p.current_status === 'SCANNED' || p.current_status === 'PLANNING').length,
-    PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY').length,
-    IN_REVIEWS: typedPatients.filter(p => ['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'].includes(p.current_status)).length,
-    COMPLETED: typedPatients.filter(p => ['TREATMENT_COMPLETED', 'JOURNEY_COMPLETE'].includes(p.current_status)).length,
+    PLAN_READY: typedPatients.filter(p => p.current_status === 'PLAN_READY' || p.current_status === 'TREATING').length,
+    IN_REVIEWS: typedPatients.filter(p => ['TREATMENT_COMPLETED', 'REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'REVIEWS_COMPLETED'].includes(p.current_status)).length,
+    COMPLETED: typedPatients.filter(p => p.current_status === 'JOURNEY_COMPLETE').length,
   }
 
   const highRiskCount = typedPatients.filter(hasHighRiskCondition).length
@@ -491,7 +493,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
         {/* Stats Cards */}
         < div className="grid md:grid-cols-5 gap-4 mt-8" >
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Patients</p>
@@ -505,7 +507,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Awaiting Scan</p>
@@ -519,7 +521,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">In Planning</p>
@@ -533,7 +535,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Ready to Treat</p>
@@ -547,7 +549,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Discharged</p>
@@ -578,7 +580,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6 lg:p-8">
             <div className="grid md:grid-cols-2 gap-6 items-center">
               {/* QR Code Preview */}
               <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 border-2 border-dashed border-gray-300">

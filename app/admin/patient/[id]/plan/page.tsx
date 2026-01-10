@@ -222,18 +222,18 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Info Banner */}
-        <div className="mb-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+        <div className="mb-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-blue-900 mb-1">
+              <h3 className="text-base sm:text-lg font-bold text-blue-900 mb-1">
                 Medical Physicist Review Required
               </h3>
-              <p className="text-sm text-blue-700 leading-relaxed">
+              <p className="text-xs sm:text-sm text-blue-700 leading-relaxed">
                 This treatment plan will be immediately visible to the patient once published.
                 The patient will receive an <strong>automatic email notification</strong> with their schedule.
                 Please verify all details carefully before submission.
@@ -269,7 +269,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
         {/* Planning Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Treatment Details */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,7 +362,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Section 2: Schedule */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,7 +452,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Section 3: Patient Preparation & Care */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,7 +522,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Section 4: Skin Care Management */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -613,7 +613,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Section 5: Immobilization Device & Setup */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -666,7 +666,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Section 6: Prescription Components Summary */}
-          <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl shadow-md p-6 border-2 border-slate-200">
+          <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl shadow-md p-4 sm:p-6 border-2 border-slate-200">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -705,7 +705,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
 
           {/* Submit Section */}
-          <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl shadow-xl p-6 text-white">
+          <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl shadow-xl p-4 sm:p-6 text-white">
             <div className="flex items-start gap-4 mb-5">
               <svg className="w-6 h-6 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

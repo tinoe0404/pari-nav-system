@@ -147,7 +147,7 @@ export default async function PatientDashboard({
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 50%, #f8fafc 100%)', minHeight: '100vh' }}>
       {/* Header - Mobile Optimized */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto px-4  sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3">
             {/* Mobile Nav + Logo */}
             <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export default async function PatientDashboard({
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {onboarding === 'complete' && (
-          <div className="mb-8 bg-green-50 border-2 border-green-200 rounded-2xl p-6 animate-fade-in">
+          <div className="mb-6 sm:mb-8 bg-green-50 border-2 border-green-200 rounded-2xl p-4 sm:p-6 animate-fade-in">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg
@@ -268,7 +268,7 @@ export default async function PatientDashboard({
         )}
 
         {/* Treatment Journey Section - Show for all statuses but less prominent for early stages */}
-        <div className={`bg-white rounded-2xl shadow-lg p-6 mb-8 ${typedPatient.current_status === 'REGISTERED' ||
+        <div className={`bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 ${typedPatient.current_status === 'REGISTERED' ||
           typedPatient.current_status === 'INTAKE_COMPLETED' ||
           typedPatient.current_status === 'CONSULTATION_COMPLETED' ||
           typedPatient.current_status === 'SCANNED'
@@ -317,7 +317,7 @@ export default async function PatientDashboard({
         {/* WAITING FOR REVIEWS: Treatment Complete but Reviews not yet scheduled */}
         {/* ============================================ */}
         {typedPatient.current_status === 'TREATMENT_COMPLETED' && typedReviews.length === 0 && (
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl shadow-xl p-6 mb-8">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl shadow-xl p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +330,7 @@ export default async function PatientDashboard({
               </div>
             </div>
 
-            <div className="bg-white/60 rounded-xl p-6 border border-blue-100">
+            <div className="bg-white/60 rounded-xl p-4 sm:p-6 border border-blue-100">
               <p className="text-blue-900 font-medium mb-2">
                 Your treatment has been marked as complete.
               </p>
@@ -347,7 +347,7 @@ export default async function PatientDashboard({
         {/* REVIEW SCHEDULE: Show when in review status */}
         {/* ============================================ */}
         {['REVIEW_1_PENDING', 'REVIEW_2_PENDING', 'REVIEW_3_PENDING', 'TREATMENT_COMPLETED'].includes(typedPatient.current_status) && typedReviews.length > 0 && (
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl shadow-xl p-6 mb-8">
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl shadow-xl p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,12 +434,12 @@ export default async function PatientDashboard({
         {/* JOURNEY COMPLETE: Celebration! */}
         {/* ============================================ */}
         {typedPatient.current_status === 'JOURNEY_COMPLETE' && (
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-2xl shadow-xl p-8 mb-8 text-center">
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-2xl shadow-xl p-4 sm:p-8 mb-6 sm:mb-8 text-center">
             <div className="text-7xl mb-4">🎉</div>
             <h3 className="text-3xl md:text-4xl font-bold text-emerald-900 mb-4">
               Congratulations, {typedPatient.full_name.split(' ')[0]}!
             </h3>
-            <div className="bg-emerald-100 border-2 border-emerald-300 rounded-xl p-6 mb-6">
+            <div className="bg-emerald-100 border-2 border-emerald-300 rounded-xl p-4 sm:p-6 mb-6">
               <p className="text-lg text-emerald-900 mb-3">
                 🌟 You have successfully completed your entire cancer treatment journey! 🌟
               </p>
@@ -460,7 +460,7 @@ export default async function PatientDashboard({
         {/* TREATMENT RESTARTED: Show notification */}
         {/* ============================================ */}
         {typedPatient.current_status === 'SCANNED' && typedPlan && !typedPlan.is_published && typedPlan.is_successful === false && (
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-xl p-6 mb-8">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-xl p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -517,7 +517,7 @@ export default async function PatientDashboard({
         {typedPlan &&
           typedPatient.current_status !== 'PLAN_READY' &&
           typedPatient.current_status !== 'TREATING' && (
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white mb-8">
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-4 sm:p-6 text-white mb-6 sm:mb-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                   <svg
@@ -643,7 +643,7 @@ export default async function PatientDashboard({
           )}
 
         {/* Help Card */}
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 sm:p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg

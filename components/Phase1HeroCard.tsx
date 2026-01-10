@@ -21,7 +21,7 @@ export default function Phase1HeroCard({ consultantRoom = 'Room 104' }: Phase1He
 
       <div className="bg-white rounded-3xl shadow-xl border border-teal-100 overflow-hidden">
         {/* Card Header */}
-        <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-6 sm:p-8 text-white">
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-4 sm:p-6 lg:p-8 text-white">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">
@@ -50,8 +50,8 @@ export default function Phase1HeroCard({ consultantRoom = 'Room 104' }: Phase1He
         </div>
 
         {/* Card Body */}
-        <div className="p-6 sm:p-8">
-          <div className="bg-teal-50 rounded-2xl p-5 border border-teal-100 flex items-center gap-4 sm:gap-6">
+        <div className="p-4 sm:p-6 lg:p-8">
+          <div className="bg-teal-50 rounded-2xl p-4 sm:p-5 border border-teal-100 flex items-center gap-4 sm:gap-6">
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
               <svg
                 className="w-6 h-6 sm:w-8 sm:h-8 text-teal-600"
