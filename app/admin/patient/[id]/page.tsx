@@ -986,23 +986,55 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   Scan History
                 </h2>
                 <div className="space-y-3">
-                  {scanLogs.map((log: any) => (
-                    <div key={log.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded">{log.machine_room}</span>
-                        <span className="text-xs text-gray-500">
-                          {new Date(log.scan_date).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
+                  {scanLogs.map((log: any) => {
+                    const { techNotes, details } = parseScanNotes(log.scan_notes);
+                    return (
+                      <div key={log.id} className="bg-gray-50 border border-gray-200 rounded-xl p-4 hover:border-purple-200 hover:bg-white transition-all shadow-sm">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full border border-purple-200">
+                              {log.machine_room}
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium">Scan Recorded</span>
+                          </div>
+                          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            {new Date(log.scan_date).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+
+                        {techNotes && (
+                          <div className="mb-4">
+                            <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                              {techNotes}
+                            </p>
+                          </div>
+                        )}
+
+                        {details && (
+                          <div className="bg-white rounded-lg border border-gray-100 p-3 shadow-inner">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">CT Scan Setup Parameters</p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              {Object.entries(details as Record<string, string>).map(([key, value]) => (
+                                <div key={key} className="flex flex-col">
+                                  <span className="text-[10px] text-gray-500 font-semibold">{key}</span>
+                                  <span className={`text-xs font-bold ${value === 'YES' ? 'text-green-600' : value === 'NO' ? 'text-red-500' : 'text-gray-900'
+                                    }`}>
+                                    {value}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">{log.scan_notes}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1011,4 +1043,37 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
       </main >
     </div >
   )
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Parses the structured scan notes string into technician comments
+ * and a key-value object of CT scan setup parameters.
+ */
+function parseScanNotes(notes: string) {
+  const marker = "[CT SCAN SETUP DETAILS]";
+  if (!notes || !notes.includes(marker)) {
+    return { techNotes: notes || "", details: null };
+  }
+
+  const parts = notes.split(marker);
+  const techNotes = parts[0]?.trim() || "";
+  const detailsStr = parts[1]?.trim() || "";
+
+  const details: Record<string, string> = {};
+  if (detailsStr) {
+    const lines = detailsStr.split("\n");
+    lines.forEach(line => {
+      // Matches lines like "- Position: Supine"
+      const match = line.match(/^-\s*([^:]+):\s*(.*)$/);
+      if (match) {
+        details[match[1].trim()] = match[2].trim();
+      }
+    });
+  }
+
+  return { techNotes, details };
 }
