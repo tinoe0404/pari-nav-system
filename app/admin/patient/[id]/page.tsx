@@ -81,10 +81,24 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     const machineRoom = formData.get('machineRoom') as string
     const notes = formData.get('notes') as string
 
+    // New CT Scan Fields
+    const position = formData.get('position') as string
+    const immobilization = formData.getAll('immobilization') as string[]
+    const bladderProtocol = formData.get('bladderProtocol') as string
+    const metalImplants = formData.get('metalImplants') as string
+    const headshell = formData.get('headshell') as string
+
     const result = await logPatientScan({
       patientId: id,
       machineRoom,
       notes,
+      scanDetails: {
+        position,
+        immobilization,
+        bladderProtocol,
+        metalImplants: metalImplants === 'yes',
+        headshell: headshell === 'yes'
+      }
     })
 
     if (result.success) {
@@ -225,17 +239,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     }
   }
 
-  const hasHighRiskCondition = (condition: keyof MedicalHistoryData['conditions']) => {
-    return medicalHistory?.conditions?.[condition] || false
-  }
 
-  // Check if ANY high-risk condition exists
-  const isHighRiskPatient = medicalHistory?.conditions && (
-    medicalHistory.conditions.pacemaker ||
-    medicalHistory.conditions.metalImplants ||
-    medicalHistory.conditions.pregnant ||
-    medicalHistory.conditions.claustrophobia
-  )
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #dce3ed 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
@@ -259,18 +263,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {/* High Risk Banner */}
-              {isHighRiskPatient && (
-                <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-4 sm:py-2 bg-red-100 border-2 border-red-400 rounded-lg animate-pulse">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-xs sm:text-sm font-bold text-red-900 whitespace-nowrap">
-                    <span className="sm:hidden">High Risk</span>
-                    <span className="hidden sm:inline">HIGH RISK PATIENT</span>
-                  </span>
-                </div>
-              )}
+
               <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border ${getStatusBadgeColor(typedPatient.current_status)}`}>
                 {getStatusLabel(typedPatient.current_status)}
               </span>
@@ -350,87 +343,15 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
             {/* Medical History Card */}
             {medicalHistory && (
-              <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
+              <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Medical History
-                  {isHighRiskPatient && (
-                    <span className="ml-auto text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">REVIEW REQUIRED</span>
-                  )}
                 </h2>
 
-                {/* High-Risk Warning Banner */}
-                {isHighRiskPatient && (
-                  <div className="mb-5 bg-gradient-to-r from-red-100 to-red-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
-                        <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-base font-bold text-red-900 mb-2">⚠️ HIGH RISK PATIENT</p>
-                        <p className="text-sm text-red-800 leading-relaxed">
-                          This patient has conditions requiring special protocols. Review all contraindications carefully.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
-                {/* Conditions Grid */}
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Medical Conditions:</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {hasHighRiskCondition('pacemaker') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
-                        <span className="text-base">⚠️</span> Pacemaker
-                      </div>
-                    )}
-                    {hasHighRiskCondition('metalImplants') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
-                        <span className="text-base">⚠️</span> Metal Implants
-                      </div>
-                    )}
-                    {hasHighRiskCondition('pregnant') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
-                        <span className="text-base">⚠️</span> Pregnant
-                      </div>
-                    )}
-                    {hasHighRiskCondition('claustrophobia') && (
-                      <div className="flex items-center gap-2 text-xs bg-red-100 text-red-900 px-3 py-2.5 rounded-lg border-2 border-red-400 font-semibold">
-                        <span className="text-base">⚠️</span> Claustrophobia
-                      </div>
-                    )}
-                    {hasHighRiskCondition('previousRadiation') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
-                        Previous Radiation
-                      </div>
-                    )}
-                    {hasHighRiskCondition('diabetes') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
-                        Diabetes
-                      </div>
-                    )}
-                    {hasHighRiskCondition('heartDisease') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
-                        Heart Disease
-                      </div>
-                    )}
-                    {hasHighRiskCondition('kidneyDisease') && (
-                      <div className="text-xs bg-yellow-100 text-yellow-900 px-3 py-2 rounded-lg border border-yellow-300 font-medium">
-                        Kidney Disease
-                      </div>
-                    )}
-                    {hasHighRiskCondition('allergies') && (
-                      <div className="text-xs bg-orange-100 text-orange-900 px-3 py-2 rounded-lg border border-orange-300 font-medium">
-                        Allergies
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 {/* Allergy Details */}
                 {medicalHistory.allergyDetails && (
@@ -484,7 +405,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
           <div className="space-y-6">
             {/* AWAITING SCAN: Scan Form (Accepts REGISTERED or CONSULTATION_COMPLETED) */}
             {(typedPatient.current_status === 'REGISTERED' || typedPatient.current_status === 'CONSULTATION_COMPLETED') && (
-              <div className={`bg-white rounded-xl shadow-md p-6 ${isHighRiskPatient ? 'ring-4 ring-red-300' : ''}`}>
+              <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
@@ -492,63 +413,125 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   Log Scan Results
                 </h2>
 
-                {isHighRiskPatient && (
-                  <div className="mb-5 bg-amber-50 border-2 border-amber-400 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      <p className="text-sm text-amber-900 font-medium">
-                        Confirm you have reviewed all high-risk conditions and verified patient eligibility for scanning.
-                      </p>
+                <form action={handleScanSubmit} className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-bold text-gray-900 mb-3">CT Scan Context</h4>
+
+                    {/* Machine Room */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Machine Room <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="machineRoom"
+                        required
+                        placeholder="e.g., CT Room 1"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    {/* 1. Position */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        1. Patient Position <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="position" value="Supine" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">Supine</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="position" value="Prone" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">Prone</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* 2. Immobilization Devices */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        2. Immobilization Devices
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Headrest B', 'Breast Board', 'Knee Support', 'Vacbag', 'Footrest'].map((device) => (
+                          <label key={device} className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="immobilization" value={device} className="w-4 h-4 text-blue-600 rounded" />
+                            <span className="text-sm text-gray-700">{device}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 3. Bladder Protocol */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        3. Bladder Filling Protocol
+                      </label>
+                      <input
+                        type="text"
+                        name="bladderProtocol"
+                        placeholder="e.g., Full bladder, Empty bladder"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    {/* 4. Metal Implants */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        4. Metal Implants present? <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="metalImplants" value="yes" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">Yes</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="metalImplants" value="no" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">No</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* 5. Headshell */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        5. Headshell used? <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="headshell" value="yes" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">YES</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="headshell" value="no" required className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm text-gray-700">NO</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
-                )}
-
-                <form action={handleScanSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Machine Room <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="machineRoom"
-                      required
-                      placeholder="e.g., CT Room 1, Scanner A"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Specify the exact scanning equipment used</p>
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Technician Notes <span className="text-red-500">*</span>
+                      Additional Technician Notes
                     </label>
                     <textarea
                       name="notes"
-                      required
-                      rows={7}
-                      placeholder="Document scan details, patient cooperation, any issues encountered, contrast used, positioning notes..."
+                      rows={3}
+                      placeholder="Any specific comments on patient setup or issues..."
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Minimum 10 characters. These notes are confidential.
-                      ```
-                    </p>
                   </div>
 
                   <button
                     type="submit"
-                    className={`w-full py-4 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${isHighRiskPatient
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-blue-600 hover:bg-blue-700'
-                      }`}
+                    className="w-full py-4 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700"
                     style={{ minHeight: '44px' }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    {isHighRiskPatient ? 'Confirm High-Risk Scan Complete' : 'Complete Scan & Update Status'}
+                    Complete Scan & Update Status
                   </button>
                 </form>
               </div>
@@ -1025,7 +1008,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
             )}
           </div>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   )
 }

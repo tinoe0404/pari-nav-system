@@ -23,6 +23,13 @@ export interface ScanLogInput {
   patientId: string
   machineRoom: string
   notes: string
+  scanDetails?: {
+    position: string
+    immobilization: string[]
+    bladderProtocol: string
+    metalImplants: boolean
+    headshell: boolean
+  }
 }
 
 export interface TreatmentPlanInput {
@@ -31,7 +38,40 @@ export interface TreatmentPlanInput {
   numSessions: number
   startDate: string
   prepInstructions?: string
-  sideEffects?: string[]
+
+  // Nutritional Interventions
+  nutritionalInterventions?: {
+    "Difficulty Swallowing"?: string
+    "Nausea"?: string
+    "Diarrhea"?: string
+    "Dry Mouth"?: string
+    "Dehydration"?: string
+  }
+
+  // Skin Care Management
+  skinCareDos?: string[]
+  skinCareDonts?: string[]
+
+  // Immobilization Device & Setup
+  immobilizationDevice?: string
+  setupConsiderations?: string
+
+  // Essential Prescription Components
+  prescriptionComponents?: {
+    patientDemographics?: string
+    primaryDiagnosis?: string
+    treatmentIntent?: string
+    anatomicalTarget?: string
+    energyModality?: string
+    absorbedDose?: string
+    fractionationSchedule?: string
+    volumeDefinitions?: string
+    technique?: string
+    imageGuidance?: string
+  }
+
+  // Legacy field for backward compatibility
+  legacySideEffects?: string[]
 }
 
 export interface ActionResponse<T = void> {
@@ -62,7 +102,7 @@ export async function logPatientScan(
     // Verify admin access
     const admin = await requireAdmin()
 
-    const { patientId, machineRoom, notes } = input
+    const { patientId, machineRoom, notes, scanDetails } = input
 
     // Enhanced validation with specific error messages
     if (!patientId?.trim()) {
@@ -73,10 +113,26 @@ export async function logPatientScan(
       return { success: false, error: 'Machine room identifier is required' }
     }
 
-    if (!notes?.trim() || notes.trim().length < 10) {
+    // Construct formatted notes if details are provided
+    let finalNotes = notes?.trim() || ''
+
+    if (scanDetails) {
+      const formattedDetails = `
+[CT SCAN SETUP DETAILS]
+- Position: ${scanDetails.position}
+- Immobilization: ${scanDetails.immobilization.join(', ') || 'None'}
+- Bladder Protocol: ${scanDetails.bladderProtocol}
+- Metal Implants: ${scanDetails.metalImplants ? 'YES' : 'NO'}
+- Headshell: ${scanDetails.headshell ? 'YES' : 'NO'}
+`.trim()
+
+      finalNotes = finalNotes ? `${finalNotes}\n\n${formattedDetails}` : formattedDetails
+    }
+
+    if (!finalNotes || finalNotes.length < 5) {
       return {
         success: false,
-        error: 'Scan notes must be at least 10 characters and describe the procedure'
+        error: 'Scan notes are required.'
       }
     }
 
@@ -129,7 +185,7 @@ export async function logPatientScan(
       .insert({
         patient_id: patientId,
         machine_room: machineRoom.trim(),
-        scan_notes: notes.trim(),
+        scan_notes: finalNotes,
         performed_by: admin.id,
         scan_date: new Date().toISOString(),
       })
@@ -197,7 +253,13 @@ export async function publishTreatmentPlan(
       numSessions,
       startDate,
       prepInstructions,
-      sideEffects,
+      nutritionalInterventions,
+      skinCareDos,
+      skinCareDonts,
+      immobilizationDevice,
+      setupConsiderations,
+      prescriptionComponents,
+      legacySideEffects,
     } = input
 
     // Enhanced validation
@@ -300,7 +362,33 @@ export async function publishTreatmentPlan(
         num_sessions: numSessions,
         start_date: startDate,
         prep_instructions: prepInstructions?.trim() || null,
-        side_effects: sideEffects && sideEffects.length > 0 ? sideEffects : [],
+
+        // Nutritional Interventions
+        nutritional_interventions: nutritionalInterventions || null,
+
+        // Skin Care Management
+        skin_care_dos: skinCareDos && skinCareDos.length > 0 ? skinCareDos : null,
+        skin_care_donts: skinCareDonts && skinCareDonts.length > 0 ? skinCareDonts : null,
+
+        // Immobilization Device & Setup
+        immobilization_device: immobilizationDevice?.trim() || null,
+        setup_considerations: setupConsiderations?.trim() || null,
+
+        // Prescription Components
+        patient_demographics: prescriptionComponents?.patientDemographics?.trim() || null,
+        primary_diagnosis: prescriptionComponents?.primaryDiagnosis?.trim() || null,
+        treatment_intent: prescriptionComponents?.treatmentIntent?.trim() || null,
+        anatomical_target: prescriptionComponents?.anatomicalTarget?.trim() || null,
+        energy_modality: prescriptionComponents?.energyModality?.trim() || null,
+        absorbed_dose: prescriptionComponents?.absorbedDose?.trim() || null,
+        fractionation_schedule: prescriptionComponents?.fractionationSchedule?.trim() || null,
+        volume_definitions: prescriptionComponents?.volumeDefinitions?.trim() || null,
+        technique: prescriptionComponents?.technique?.trim() || null,
+        image_guidance: prescriptionComponents?.imageGuidance?.trim() || null,
+
+        // Legacy field for backward compatibility
+        legacy_side_effects: legacySideEffects && legacySideEffects.length > 0 ? legacySideEffects : null,
+
         is_published: true,
         created_by: admin.id,
         created_at: new Date().toISOString(),

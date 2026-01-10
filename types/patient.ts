@@ -41,7 +41,39 @@ export interface TreatmentPlan {
   num_sessions: number
   start_date: string
   prep_instructions: string | null
-  side_effects: string[]
+
+  // Nutritional Interventions (replaces side_effects)
+  nutritional_interventions: {
+    "Difficulty Swallowing"?: string
+    "Nausea"?: string
+    "Diarrhea"?: string
+    "Dry Mouth"?: string
+    "Dehydration"?: string
+  } | null
+
+  // Skin Care Management
+  skin_care_dos: string[] | null
+  skin_care_donts: string[] | null
+
+  // Immobilization Device & Setup
+  immobilization_device: string | null
+  setup_considerations: string | null
+
+  // Essential Prescription Components
+  patient_demographics: string | null
+  primary_diagnosis: string | null
+  treatment_intent: string | null
+  anatomical_target: string | null
+  energy_modality: string | null
+  absorbed_dose: string | null
+  fractionation_schedule: string | null
+  volume_definitions: string | null
+  technique: string | null
+  image_guidance: string | null
+
+  // Legacy field for backward compatibility
+  legacy_side_effects: string[] | null
+
   is_published: boolean
   is_successful: boolean | null
   outcome_notes: string | null

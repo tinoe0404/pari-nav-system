@@ -31,18 +31,29 @@ export async function submitIntakeForm(formData: FormData) {
   }
 
   // Parse form data
-  const conditions = formData.getAll('conditions') as string[]
-  const allergyDetails = formData.get('allergyDetails') as string
   const currentSymptoms = formData.get('currentSymptoms') as string
   const mobilityStatus = formData.get('mobilityStatus') as string
-  const nextOfKinName = formData.get('nextOfKinName') as string
-  const nextOfKinRelationship = formData.get('nextOfKinRelationship') as string
-  const nextOfKinPhone = formData.get('nextOfKinPhone') as string
   const additionalNotes = formData.get('additionalNotes') as string
   const consentGiven = formData.get('consentGiven') === 'true'
 
+  // New fields
+  const maritalStatus = formData.get('maritalStatus') as string
+  const nationalId = formData.get('nationalId') as string
+  const residentialAddress = formData.get('residentialAddress') as string
+  const occupation = formData.get('occupation') as string
+  const employerName = formData.get('employerName') as string
+  const employerAddress = formData.get('employerAddress') as string
+  const diagnosis = formData.get('diagnosis') as string
+  const referringPhysician = formData.get('referringPhysician') as string
+  const admissionDate = formData.get('admissionDate') as string
+
+  const nextOfKinName = formData.get('nextOfKinName') as string
+  const nextOfKinRelationship = formData.get('nextOfKinRelationship') as string
+  const nextOfKinPhone = formData.get('nextOfKinPhone') as string
+  const nextOfKinAddress = formData.get('nextOfKinAddress') as string
+
   // Validate required fields
-  if (!currentSymptoms || !mobilityStatus || !nextOfKinName || !nextOfKinPhone) {
+  if (!nationalId || !maritalStatus || !residentialAddress || !occupation || !employerName || !diagnosis || !nextOfKinName || !nextOfKinPhone || !admissionDate) {
     redirect('/onboarding?error=Please fill in all required fields')
   }
 
@@ -52,37 +63,34 @@ export async function submitIntakeForm(formData: FormData) {
 
   // Build medical history object
   const medicalHistory: MedicalHistoryData = {
-    conditions: {
-      pacemaker: conditions.includes('pacemaker'),
-      previousRadiation: conditions.includes('previousRadiation'),
-      claustrophobia: conditions.includes('claustrophobia'),
-      metalImplants: conditions.includes('metalImplants'),
-      diabetes: conditions.includes('diabetes'),
-      heartDisease: conditions.includes('heartDisease'),
-      kidneyDisease: conditions.includes('kidneyDisease'),
-      pregnant: conditions.includes('pregnant'),
-      allergies: conditions.includes('allergies'),
+    // New Fields
+    maritalStatus: maritalStatus as MedicalHistoryData['maritalStatus'],
+    nationalId,
+    residentialAddress,
+    occupation,
+    employer: {
+      name: employerName,
+      address: employerAddress
     },
-    allergyDetails: conditions.includes('allergies') ? allergyDetails : undefined,
+    diagnosis,
+    referringPhysician,
+    admissionDate,
+
     currentSymptoms,
     mobilityStatus: mobilityStatus as MedicalHistoryData['mobilityStatus'],
     nextOfKin: {
       name: nextOfKinName,
       relationship: nextOfKinRelationship,
       phone: nextOfKinPhone,
+      address: nextOfKinAddress
     },
     additionalNotes: additionalNotes || undefined,
     consentGiven,
     consentDate: new Date().toISOString(),
   }
 
-  // Update risk_flags based on conditions
-  const riskFlags: string[] = []
-  if (medicalHistory.conditions.pacemaker) riskFlags.push('Pacemaker')
-  if (medicalHistory.conditions.metalImplants) riskFlags.push('Metal Implants')
-  if (medicalHistory.conditions.claustrophobia) riskFlags.push('Claustrophobia')
-  if (medicalHistory.conditions.pregnant) riskFlags.push('Pregnant')
-  if (medicalHistory.conditions.allergies) riskFlags.push('Allergies')
+  // Update risk_flags (Reset or remove legacy logic)
+  const riskFlags: string[] = [] // Legacy risk flags removed as per strict replacement request
 
   // Update patient record
   const { error: updateError } = await supabase

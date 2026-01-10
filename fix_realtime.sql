@@ -1,12 +1,22 @@
 -- ==============================================
--- FIX PERMISSIONS ONLY (Since Realtime is active)
+-- FIX PERMISSIONS AND REALTIME CONFIGURATION
 -- ==============================================
 
--- 1. Update Admin RLS Policies (Safely)
--- We drop existing policies first to avoid "already exists" errors, 
--- then recreate them to ensure they are correct.
+-- 1. Enable RLS (Ensure it is on)
+alter table patients enable row level security;
+alter table treatment_plans enable row level security;
+alter table treatment_reviews enable row level security;
+alter table profiles enable row level security;
 
--- Patients Policy
+-- 2. RESET Realtime Publication (The "Nuclear" Option)
+-- This ensures these tables are definitely in the publication.
+-- WARNING: This replaces the list of tables in the publication with ONLY these.
+-- If you have other tables relying on realtime, add them to this list.
+alter publication supabase_realtime set table patients, treatment_plans, treatment_reviews;
+
+-- 3. Update Admin RLS Policies
+
+-- Patients Policy: Allow Admins to View All
 drop policy if exists "Admins can view all patients" on patients;
 create policy "Admins can view all patients"
 on patients for select
@@ -19,7 +29,7 @@ using (
   )
 );
 
--- Treatment Plans Policy
+-- Treatment Plans Policy: Allow Admins to View All
 drop policy if exists "Admins can view all treatment plans" on treatment_plans;
 create policy "Admins can view all treatment plans"
 on treatment_plans for select
@@ -32,7 +42,7 @@ using (
   )
 );
 
--- Treatment Reviews Policy
+-- Treatment Reviews Policy: Allow Admins to View All
 drop policy if exists "Admins can view all reviews" on treatment_reviews;
 create policy "Admins can view all reviews"
 on treatment_reviews for select
@@ -45,7 +55,8 @@ using (
   )
 );
 
--- Profiles Access
+-- Profiles Access: Allow Users to View Own Profile
+-- This is critical for the admin check above to work!
 drop policy if exists "Users can view own profile" on profiles;
 create policy "Users can view own profile"
 on profiles for select

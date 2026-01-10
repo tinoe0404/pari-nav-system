@@ -574,13 +574,60 @@ export default async function PatientDashboard({
                   </div>
                 )}
 
-                {typedPlan.side_effects && typedPlan.side_effects.length > 0 && (
+                {typedPlan.nutritional_interventions && Object.keys(typedPlan.nutritional_interventions).length > 0 && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <p className="text-purple-200 text-sm mb-2 font-semibold">
+                      Nutritional Guidance
+                    </p>
+                    <div className="space-y-2">
+                      {Object.entries(typedPlan.nutritional_interventions).filter(([_, value]) => value).map(([key, value]) => (
+                        <div key={key} className="text-sm leading-relaxed">
+                          <span className="font-semibold text-purple-100">{key}:</span>{' '}
+                          <span className="text-purple-50">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(typedPlan.skin_care_dos || typedPlan.skin_care_donts) && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <p className="text-purple-200 text-sm mb-2 font-semibold">
+                      Skin Care Instructions
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                      {typedPlan.skin_care_dos && typedPlan.skin_care_dos.length > 0 && (
+                        <div>
+                          <p className="text-green-300 font-semibold mb-1">✓ Do's</p>
+                          <ul className="space-y-1 text-purple-100">
+                            {typedPlan.skin_care_dos.slice(0, 3).map((item, idx) => (
+                              <li key={idx}>• {item.substring(0, 50)}{item.length > 50 ? '...' : ''}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {typedPlan.skin_care_donts && typedPlan.skin_care_donts.length > 0 && (
+                        <div>
+                          <p className="text-red-300 font-semibold mb-1">✗ Don'ts</p>
+                          <ul className="space-y-1 text-purple-100">
+                            {typedPlan.skin_care_donts.slice(0, 3).map((item, idx) => (
+                              <li key={idx}>• {item.substring(0, 50)}{item.length > 50 ? '...' : ''}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Legacy side effects - for backward compatibility */}
+                {typedPlan.legacy_side_effects && typedPlan.legacy_side_effects.length > 0 && (
                   <div className="bg-amber-500/20 backdrop-blur-sm rounded-xl p-4 border border-amber-400/30">
                     <p className="text-amber-100 text-sm mb-2 font-semibold">
-                      Possible Side Effects
+                      Side Effects (Legacy)
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {typedPlan.side_effects.map((effect, index) => (
+                      {typedPlan.legacy_side_effects.map((effect, index) => (
                         <span
                           key={index}
                           className="inline-block text-xs bg-white/20 px-3 py-1 rounded-full"

@@ -26,18 +26,49 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
   const [startTime, setStartTime] = useState<string>('09:00')
   const [treatmentRoom, setTreatmentRoom] = useState<string>('Room 1 (Linear Accelerator)')
   const [prepInstructions, setPrepInstructions] = useState<string>('Full Bladder')
-  const [sideEffects, setSideEffects] = useState<string[]>([])
+
+  // Nutritional Interventions state
+  const [nutritionalInterventions, setNutritionalInterventions] = useState<{
+    "Difficulty Swallowing"?: string
+    "Nausea"?: string
+    "Diarrhea"?: string
+    "Dry Mouth"?: string
+    "Dehydration"?: string
+  }>({})
+
+  // Skin Care Management state
+  const [skinCareDos, setSkinCareDos] = useState<string[]>([])
+  const [skinCareDonts, setSkinCareDonts] = useState<string[]>([])
+
+  // Immobilization Device state
+  const [immobilizationDevice, setImmobilizationDevice] = useState<string>('')
+  const [setupConsiderations, setSetupConsiderations] = useState<string>('')
 
   // Unwrap params on mount
   useEffect(() => {
     params.then(p => setPatientId(p.id))
   }, [params])
 
-  const handleSideEffectToggle = (effect: string) => {
-    setSideEffects(prev =>
-      prev.includes(effect)
-        ? prev.filter(e => e !== effect)
-        : [...prev, effect]
+  const handleNutritionalInterventionChange = (key: keyof typeof nutritionalInterventions, value: string) => {
+    setNutritionalInterventions(prev => ({
+      ...prev,
+      [key]: value.trim() || undefined
+    }))
+  }
+
+  const handleSkinCareDoToggle = (item: string) => {
+    setSkinCareDos(prev =>
+      prev.includes(item)
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    )
+  }
+
+  const handleSkinCareDontToggle = (item: string) => {
+    setSkinCareDonts(prev =>
+      prev.includes(item)
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
     )
   }
 
@@ -97,13 +128,25 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
     // Build prep instructions text
     const prepText = `Patient must arrive with: ${prepInstructions}. Treatment will be administered in ${treatmentRoom}.`
 
+    // Build prescription components
+    const prescriptionComponents = {
+      fractionationSchedule: `${numSessions} fractions`,
+      technique: treatmentType,
+      // Add more auto-populated fields as needed
+    }
+
     const input: TreatmentPlanInput = {
       patientId,
       treatmentType,
       numSessions,
       startDate: startDateTime,
       prepInstructions: prepText,
-      sideEffects: sideEffects.length > 0 ? sideEffects : undefined,
+      nutritionalInterventions: Object.keys(nutritionalInterventions).length > 0 ? nutritionalInterventions : undefined,
+      skinCareDos: skinCareDos.length > 0 ? skinCareDos : undefined,
+      skinCareDonts: skinCareDonts.length > 0 ? skinCareDonts : undefined,
+      immobilizationDevice: immobilizationDevice.trim() || undefined,
+      setupConsiderations: setupConsiderations.trim() || undefined,
+      prescriptionComponents,
     }
 
     try {
@@ -223,7 +266,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Planning Form - SAME AS BEFORE */}
+        {/* Planning Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Treatment Details */}
           <div className="bg-white rounded-xl shadow-md p-6">
@@ -247,8 +290,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 </label>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentType === 'External Beam'
-                      ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                    ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
                     }`}>
                     <input
                       type="radio"
@@ -265,8 +308,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     </div>
                   </label>
                   <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentType === 'Brachytherapy'
-                      ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                    ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
                     }`}>
                     <input
                       type="radio"
@@ -333,7 +376,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
             </div>
 
             <div className="space-y-5">
-              {/* Start Date & Time - Mobile: Stack vertically */}
+              {/* Start Date & Time */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -408,7 +451,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Section 3: Patient Care */}
+          {/* Section 3: Patient Preparation & Care */}
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -418,7 +461,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Patient Preparation & Care</h2>
-                <p className="text-sm text-gray-600">Instructions and side effects</p>
+                <p className="text-sm text-gray-600">Instructions and nutritional guidance</p>
               </div>
             </div>
 
@@ -443,47 +486,221 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <p className="text-xs text-gray-500 mt-1">This will be communicated to the patient</p>
               </div>
 
-              {/* Potential Side Effects */}
+              {/* Nutritional Interventions Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Potential Side Effects (Select all that apply)
+                  Nutritional Interventions and Lifestyle Strategy
                 </label>
-                <div className="grid sm:grid-cols-2 gap-3">
+                <p className="text-xs text-gray-500 mb-4">
+                  Provide dietary and lifestyle recommendations for managing treatment side effects
+                </p>
+                <div className="space-y-4">
                   {[
-                    { value: 'Fatigue', desc: 'Tiredness, low energy' },
-                    { value: 'Skin Redness', desc: 'Irritation at treatment site' },
-                    { value: 'Nausea', desc: 'Stomach upset' },
-                    { value: 'Urinary Irritation', desc: 'Frequent urination' },
-                    { value: 'Bowel Changes', desc: 'Diarrhea or constipation' },
-                    { value: 'Hair Loss', desc: 'In treatment area' },
-                    { value: 'Loss of Appetite', desc: 'Reduced hunger' },
-                    { value: 'Dry Mouth', desc: 'Reduced saliva production' },
-                  ].map((effect) => (
+                    { key: "Difficulty Swallowing" as const, placeholder: "e.g., Eat soft, moist foods with extra gravies; avoid spicy or acidic foods" },
+                    { key: "Nausea" as const, placeholder: "e.g., Eat small, frequent meals of bland foods (crackers, toast); drink clear liquids" },
+                    { key: "Diarrhea" as const, placeholder: "e.g., Increase clear fluids (Gatorade, broth); avoid high-fiber foods and milk products" },
+                    { key: "Dry Mouth" as const, placeholder: "e.g., Sip water frequently; use ice chips or saliva substitutes; avoid smoking and alcohol" },
+                    { key: "Dehydration" as const, placeholder: "e.g., Aim for eight to ten 8-ounce glasses of fluid daily" },
+                  ].map((item) => (
+                    <div key={item.key} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {item.key}
+                      </label>
+                      <textarea
+                        value={nutritionalInterventions[item.key] || ''}
+                        onChange={(e) => handleNutritionalInterventionChange(item.key, e.target.value)}
+                        placeholder={item.placeholder}
+                        disabled={isSubmitting}
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-sm resize-none"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Skin Care Management */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Skin Care Management</h2>
+                <p className="text-sm text-gray-600">Managing radiation dermatitis</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
+              <p className="text-sm text-blue-900">
+                Radiotherapy can cause the skin to become red, dry, itchy, and sensitive—a condition known as radiation dermatitis.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* The Dos */}
+              <div>
+                <label className="block text-sm font-semibold text-green-700 mb-3">
+                  ✓ The Dos
+                </label>
+                <div className="space-y-2">
+                  {[
+                    "Wash treated area daily with warm water and gentle, low-pH, fragrance-free cleanser",
+                    "Use hands to gently splash water; avoid washcloths, loofahs, or sponges",
+                    "Pat skin dry with soft, clean towel",
+                    "Apply clinician-recommended moisturizer (e.g., Aquaphor or 100% pure Aloe Vera) daily",
+                    "Wear loose-fitting clothing made of natural fibers like cotton",
+                    "Protect treatment area from sun with sun-protective clothing or wide-brimmed hat",
+                  ].map((item) => (
                     <label
-                      key={effect.value}
-                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${sideEffects.includes(effect.value)
-                          ? 'border-orange-500 bg-orange-50'
-                          : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                      key={item}
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${skinCareDos.includes(item)
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
                         }`}
                     >
                       <input
                         type="checkbox"
-                        checked={sideEffects.includes(effect.value)}
-                        onChange={() => handleSideEffectToggle(effect.value)}
+                        checked={skinCareDos.includes(item)}
+                        onChange={() => handleSkinCareDoToggle(item)}
                         disabled={isSubmitting}
-                        className="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
+                        className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 mt-0.5 flex-shrink-0"
                       />
-                      <div>
-                        <span className="text-sm font-medium text-gray-700 block">{effect.value}</span>
-                        <span className="text-xs text-gray-500">{effect.desc}</span>
-                      </div>
+                      <span className="text-sm text-gray-700 leading-tight">{item}</span>
                     </label>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Selected effects will be communicated to the patient with management tips
-                </p>
               </div>
+
+              {/* The Don'ts */}
+              <div>
+                <label className="block text-sm font-semibold text-red-700 mb-3">
+                  ✗ The Don'ts
+                </label>
+                <div className="space-y-2">
+                  {[
+                    "Do not scrub or rub the treatment area vigorously",
+                    "Do not wash off ink marks or tattoos used for treatment alignment",
+                    "Do not apply heating pads, hot water bottles, ice packs, or take hot tubs/saunas",
+                    "Do not use deodorants, antiperspirants, perfumes, or makeup in treatment field unless approved",
+                    "Do not use adhesive tape, bandages, or medicated patches on treated skin",
+                    "Do not shave treatment area; if necessary, use only electric razor",
+                  ].map((item) => (
+                    <label
+                      key={item}
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${skinCareDonts.includes(item)
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300 hover:bg-red-50'
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={skinCareDonts.includes(item)}
+                        onChange={() => handleSkinCareDontToggle(item)}
+                        disabled={isSubmitting}
+                        className="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 mt-0.5 flex-shrink-0"
+                      />
+                      <span className="text-sm text-gray-700 leading-tight">{item}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 5: Immobilization Device & Setup */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Immobilization Device & Setup</h2>
+                <p className="text-sm text-gray-600">Patient positioning specifications</p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              {/* Primary Immobilization Device */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Primary Immobilization Device
+                </label>
+                <select
+                  value={immobilizationDevice}
+                  onChange={(e) => setImmobilizationDevice(e.target.value)}
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                >
+                  <option value="">Select device (optional)</option>
+                  <option value="Thermoplastic mask (3-point or 5-point)">Thermoplastic mask (3-point or 5-point)</option>
+                  <option value="Breast board, wing board, or vacuum bag">Breast board, wing board, or vacuum bag</option>
+                  <option value="Vacuum bag (Vac-Lok), knee and ankle sponges">Vacuum bag (Vac-Lok), knee and ankle sponges</option>
+                  <option value="Customized foam or vacuum cushions">Customized foam or vacuum cushions</option>
+                  <option value="High-precision vacuum bags or SBRT frames">High-precision vacuum bags or SBRT frames</option>
+                </select>
+              </div>
+
+              {/* Setup Considerations */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Setup Considerations
+                </label>
+                <textarea
+                  value={setupConsiderations}
+                  onChange={(e) => setSetupConsiderations(e.target.value)}
+                  placeholder="e.g., Shoulder retractors mandatory for 3-point masks; dentures and piercings removed&#10;e.g., Bladder and bowel preparation protocols to manage internal organ motion&#10;e.g., Ensuring comfort to minimize intrafraction movement"
+                  disabled={isSubmitting}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-sm resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">Describe any special positioning requirements or patient preparation needs</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 6: Prescription Components Summary */}
+          <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl shadow-md p-6 border-2 border-slate-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Essential Prescription Components</h2>
+                <p className="text-sm text-gray-600">Clinical specification summary</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-5 space-y-3">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-slate-50 rounded p-3">
+                  <p className="text-xs text-slate-600 mb-1">Treatment Intent</p>
+                  <p className="text-sm font-semibold text-slate-900">Definitive/Curative</p>
+                </div>
+                <div className="bg-slate-50 rounded p-3">
+                  <p className="text-xs text-slate-600 mb-1">Energy and Modality</p>
+                  <p className="text-sm font-semibold text-slate-900">{treatmentType}</p>
+                </div>
+                <div className="bg-slate-50 rounded p-3">
+                  <p className="text-xs text-slate-600 mb-1">Fractionation Schedule</p>
+                  <p className="text-sm font-semibold text-slate-900">{numSessions} fractions</p>
+                </div>
+                <div className="bg-slate-50 rounded p-3">
+                  <p className="text-xs text-slate-600 mb-1">Technique</p>
+                  <p className="text-sm font-semibold text-slate-900">{treatmentType === 'External Beam' ? '3DCRT, IMRT, VMAT, or SBRT' : 'Brachytherapy'}</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-4">
+                <strong>Note:</strong> Full prescription components including patient demographics, primary diagnosis, anatomical target, absorbed dose, volume definitions, and image guidance will be documented in the treatment record.
+              </p>
             </div>
           </div>
 
@@ -497,7 +714,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <p className="font-semibold mb-1">Ready to Publish Treatment Plan?</p>
                 <p className="text-sm text-purple-100 leading-relaxed">
                   The patient will receive immediate notification with their treatment schedule, preparation
-                  instructions, and expected side effects. This action cannot be undone. Please ensure all
+                  instructions, nutritional guidance, and skin care instructions. This action cannot be undone. Please ensure all
                   details are accurate before publishing.
                 </p>
               </div>
@@ -520,8 +737,8 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                   <p className="font-semibold">{startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'Not set'}</p>
                 </div>
                 <div>
-                  <p className="text-purple-200 text-xs">Side Effects Selected</p>
-                  <p className="font-semibold">{sideEffects.length || 'None'}</p>
+                  <p className="text-purple-200 text-xs">Nutritional Interventions</p>
+                  <p className="font-semibold">{Object.keys(nutritionalInterventions).filter(k => nutritionalInterventions[k as keyof typeof nutritionalInterventions]).length || 'None'}</p>
                 </div>
               </div>
             </div>

@@ -9,7 +9,6 @@ interface IntakeFormClientProps {
 }
 
 export default function IntakeFormClient({ error }: IntakeFormClientProps) {
-    const [showAllergyDetails, setShowAllergyDetails] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     async function handleSubmit(formData: FormData) {
@@ -138,207 +137,168 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
 
                 {/* Form */}
                 <form action={handleSubmit} className="space-y-8">
-                    {/* Section 1: Medical History */}
+                    {/* Section 1: Patient Details */}
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-red-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                    />
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Medical History</h3>
-                                <p className="text-sm text-gray-600">Select all that apply to you</p>
+                                <h3 className="text-xl font-bold text-gray-900">Personal Details</h3>
+                                <p className="text-sm text-gray-600">Basic patient information</p>
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            {[
-                                { id: 'pacemaker', label: 'Pacemaker or Implantable Cardioverter Defibrillator (ICD)' },
-                                { id: 'previousRadiation', label: 'Previous Radiation Therapy' },
-                                { id: 'claustrophobia', label: 'Claustrophobia (fear of enclosed spaces)' },
-                                { id: 'metalImplants', label: 'Metal Implants (surgical pins, plates, screws)' },
-                                { id: 'diabetes', label: 'Diabetes' },
-                                { id: 'heartDisease', label: 'Heart Disease' },
-                                { id: 'kidneyDisease', label: 'Kidney Disease' },
-                                { id: 'pregnant', label: 'Pregnant or Possibly Pregnant' },
-                                { id: 'allergies', label: 'Allergies (medications, contrast dye, latex)' },
-                            ].map((condition) => (
-                                <label
-                                    key={condition.id}
-                                    className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        name="conditions"
-                                        value={condition.id}
-                                        disabled={isSubmitting}
-                                        onChange={(e) => {
-                                            if (condition.id === 'allergies') {
-                                                setShowAllergyDetails(e.target.checked)
-                                            }
-                                        }}
-                                        className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
-                                    />
-                                    <span className="text-sm text-gray-700 font-medium">
-                                        {condition.label}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-
-                        {/* Allergy Details (conditional) */}
-                        {showAllergyDetails && (
-                            <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+                        <div className="grid md:grid-cols-2 gap-4 space-y-0">
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Please specify your allergies <span className="text-red-500">*</span>
+                                    Full Name (Read-only)
                                 </label>
-                                <textarea
-                                    name="allergyDetails"
-                                    rows={3}
-                                    disabled={isSubmitting}
-                                    required={showAllergyDetails}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
-                                    placeholder="e.g., Penicillin, Iodine contrast dye..."
+                                <input
+                                    type="text"
+                                    disabled
+                                    className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                                    value="[Auto-filled from profile]"
                                 />
                             </div>
-                        )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Date of Birth (Read-only)
+                                </label>
+                                <input
+                                    type="text"
+                                    disabled
+                                    className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                                    value="[Auto-filled from profile]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    National ID Number <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="nationalId"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="e.g., 63-123456-X-23"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Marital Status <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    name="maritalStatus"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
+                                >
+                                    <option value="">Select status...</option>
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                    <option value="divorced">Divorced</option>
+                                    <option value="widowed">Widowed</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Residential Address <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    name="residentialAddress"
+                                    rows={3}
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                                    placeholder="Enter full physical address..."
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Section 2: Current Symptoms */}
+                    {/* Section 2: Employment */}
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-orange-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
+                            <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Current Symptoms</h3>
-                                <p className="text-sm text-gray-600">Describe what you&apos;re experiencing</p>
+                                <h3 className="text-xl font-bold text-gray-900">Employment</h3>
+                                <p className="text-sm text-gray-600">Occupation and employer details</p>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Please describe your symptoms in detail <span className="text-red-500">*</span>
-                            </label>
-                            <textarea
-                                name="currentSymptoms"
-                                rows={5}
-                                required
-                                disabled={isSubmitting}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
-                                placeholder="e.g., Pain in left hip when walking, difficulty breathing, persistent cough..."
-                            />
-                            <p className="mt-2 text-xs text-gray-500">
-                                Include location, duration, and severity of symptoms
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Section 3: Mobility Status */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-green-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                                    />
-                                </svg>
-                            </div>
+                        <div className="grid md:grid-cols-2 gap-4">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Mobility Status</h3>
-                                <p className="text-sm text-gray-600">How do you get around?</p>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Occupation <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="occupation"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="e.g., Teacher, Engineer, Unemployed"
+                                />
                             </div>
-                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                                Select your mobility status <span className="text-red-500">*</span>
-                            </label>
-                            <div className="grid sm:grid-cols-2 gap-3">
-                                {[
-                                    { value: 'walking', label: 'Walking Independently', icon: '🚶' },
-                                    { value: 'assistance_needed', label: 'Walking with Assistance', icon: '🦯' },
-                                    { value: 'wheelchair', label: 'Wheelchair', icon: '♿' },
-                                    { value: 'stretcher', label: 'Stretcher/Bed', icon: '🛏️' },
-                                ].map((option) => (
-                                    <label
-                                        key={option.value}
-                                        className="relative flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer"
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="mobilityStatus"
-                                            value={option.value}
-                                            required
-                                            disabled={isSubmitting}
-                                            className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50"
-                                        />
-                                        <span className="text-2xl">{option.icon}</span>
-                                        <span className="text-sm text-gray-700 font-medium">
-                                            {option.label}
-                                        </span>
-                                    </label>
-                                ))}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Employer Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="employerName"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Company/Organization name"
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Employer Address <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="employerAddress"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Workplace address"
+                                />
                             </div>
                         </div>
                     </div>
 
-                    {/* Section 4: Next of Kin */}
+                    {/* Section 3: Next of Kin */}
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-purple-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                    />
+                                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Emergency Contact</h3>
-                                <p className="text-sm text-gray-600">Next of kin information</p>
+                                <h3 className="text-xl font-bold text-gray-900">Next of Kin</h3>
+                                <p className="text-sm text-gray-600">Emergency contact information</p>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Full Name <span className="text-red-500">*</span>
@@ -348,8 +308,8 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinName"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
-                                    placeholder="e.g., John Moyo"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Next of kin's name"
                                 />
                             </div>
 
@@ -362,8 +322,8 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinRelationship"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
-                                    placeholder="e.g., Spouse, Sibling, Parent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="e.g., Spouse, Mother, Son"
                                 />
                             </div>
 
@@ -376,43 +336,139 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinPhone"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
-                                    placeholder="e.g., +263 77 123 4567"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="+263 7..."
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Address <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    name="nextOfKinAddress"
+                                    rows={2}
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                                    placeholder="Next of kin's physical address"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* Section 5: Additional Notes */}
+                    {/* Section 4: Clinical Information */}
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-gray-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                    />
+                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Additional Information</h3>
-                                <p className="text-sm text-gray-600">Anything else we should know?</p>
+                                <h3 className="text-xl font-bold text-gray-900">Clinical Information</h3>
+                                <p className="text-sm text-gray-600">Diagnosis and referral details</p>
                             </div>
                         </div>
 
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Primary Diagnosis <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="diagnosis"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="e.g., Carcinoma of the Cervix Stage IIB"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Referring Physician <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="referringPhysician"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Doctor who referred you"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Mobility Status <span className="text-red-500">*</span>
+                                </label>
+                                <div className="grid sm:grid-cols-2 gap-3">
+                                    {[
+                                        { value: 'walking', label: 'Walking Independently', icon: '🚶' },
+                                        { value: 'assistance_needed', label: 'Walking with Assistance', icon: '🦯' },
+                                        { value: 'wheelchair', label: 'Wheelchair', icon: '♿' },
+                                        { value: 'stretcher', label: 'Stretcher/Bed', icon: '🛏️' },
+                                    ].map((option) => (
+                                        <label
+                                            key={option.value}
+                                            className="relative flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer"
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="mobilityStatus"
+                                                value={option.value}
+                                                required
+                                                disabled={isSubmitting}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50"
+                                            />
+                                            <span className="text-xl">{option.icon}</span>
+                                            <span className="text-sm text-gray-700 font-medium">
+                                                {option.label}
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Current Symptoms <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    name="currentSymptoms"
+                                    rows={3}
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
+                                    placeholder="Describe your current symptoms, pain levels, and any other relevant issues..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Date & Time of Admission <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="admissionDate"
+                                    required
+                                    disabled={isSubmitting}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Section 6: Additional Information */}
+                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 className="text-lg font-bold text-gray-900 mb-3">Additional Information</h3>
                         <textarea
                             name="additionalNotes"
-                            rows={4}
+                            rows={3}
                             disabled={isSubmitting}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
-                            placeholder="Any other medical conditions, concerns, or special requirements..."
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                            placeholder="Any other medical conditions or concerns..."
                         />
                     </div>
 
