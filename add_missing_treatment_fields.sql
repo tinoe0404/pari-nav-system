@@ -21,7 +21,10 @@ ADD COLUMN IF NOT EXISTS absorbed_dose TEXT,
 ADD COLUMN IF NOT EXISTS fractionation_schedule TEXT,
 ADD COLUMN IF NOT EXISTS volume_definitions TEXT,
 ADD COLUMN IF NOT EXISTS technique TEXT,
-ADD COLUMN IF NOT EXISTS image_guidance TEXT;
+ADD COLUMN IF NOT EXISTS image_guidance TEXT,
+
+-- Legacy field for backward compatibility
+ADD COLUMN IF NOT EXISTS legacy_side_effects TEXT[];
 
 -- Ensure created_by column exists (referenced in publishTreatmentPlan action)
 DO $$ 
