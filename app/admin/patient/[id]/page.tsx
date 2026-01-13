@@ -214,6 +214,10 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
     switch (status) {
       case 'REGISTERED':
         return 'Intake Complete'
+      case 'INTAKE_COMPLETED':
+        return 'Awaiting Consultation'
+      case 'CONSULTATION_COMPLETED':
+        return 'Ready for Scan'
       case 'SCANNED':
         return 'Scanned'
       case 'PLANNING':
@@ -403,8 +407,24 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
 
           {/* RIGHT COLUMN: Actions & Treatment Plan */}
           <div className="space-y-6">
-            {/* AWAITING SCAN: Scan Form (Accepts REGISTERED or CONSULTATION_COMPLETED) */}
-            {(typedPatient.current_status === 'REGISTERED' || typedPatient.current_status === 'CONSULTATION_COMPLETED') && (
+            {/* Awaiting Consultation Message */}
+            {typedPatient.current_status === 'INTAKE_COMPLETED' && (
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl shadow-md p-4 sm:p-6 lg:p-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-lg font-bold text-yellow-900">Awaiting Patient Consultation</h3>
+                </div>
+                <p className="text-sm text-yellow-800">
+                  Patient has completed intake form but has not yet marked their consultation as complete.
+                  The scan form will become available once the patient confirms consultation completion.
+                </p>
+              </div>
+            )}
+
+            {/* CONSULTATION COMPLETED: Scan Form */}
+            {typedPatient.current_status === 'CONSULTATION_COMPLETED' && (
               <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

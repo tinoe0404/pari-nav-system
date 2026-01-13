@@ -149,9 +149,11 @@ export async function logPatientScan(
       return { success: false, error: 'Patient not found in system' }
     }
 
-    // Safety Check: Verify patient status - Allow REGISTERED (legacy) or CONSULTATION_COMPLETED (new flow)
-    if (patient.current_status !== 'REGISTERED' && patient.current_status !== 'CONSULTATION_COMPLETED') {
+    // Safety Check: Patient must mark consultation as complete before scan
+    if (patient.current_status !== 'CONSULTATION_COMPLETED') {
       const statusMap: Record<string, string> = {
+        'REGISTERED': 'patient has not completed intake yet',
+        'INTAKE_COMPLETED': 'patient has not marked consultation as complete',
         'SCANNED': 'already scanned',
         'PLANNING': 'in planning phase',
         'PLAN_READY': 'awaiting treatment',
@@ -161,7 +163,7 @@ export async function logPatientScan(
       const statusDesc = statusMap[patient.current_status] || patient.current_status.toLowerCase()
       return {
         success: false,
-        error: `Cannot log scan - patient is ${statusDesc}. Only REGISTERED patients can be scanned.`,
+        error: `Cannot log scan - ${statusDesc}. Patient must mark consultation as complete first.`,
       }
     }
 
