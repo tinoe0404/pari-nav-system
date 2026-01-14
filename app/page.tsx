@@ -191,8 +191,8 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
                 4
               </div>
-              <h4 className="text-white font-semibold mb-2 text-lg">Physics Planning</h4>
-              <p className="text-blue-200 text-sm leading-relaxed">Our clinical physics team calculates your personalized dose distribution.</p>
+              <h4 className="text-white font-semibold mb-2 text-lg">Medical Planning</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Our clinical medical team calculates your personalized dose distribution.</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
