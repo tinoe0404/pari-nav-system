@@ -342,6 +342,40 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     })}
                   </p>
                 </div>
+
+                {/* Extended Patient Details from Intake */}
+                {medicalHistory && (
+                  <>
+                    <div className="pt-3 border-t border-gray-100"></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs text-gray-600 font-medium">National ID</p>
+                        <p className="text-sm font-medium text-gray-900">{medicalHistory.nationalId || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-600 font-medium">Marital Status</p>
+                        <p className="text-sm font-medium text-gray-900 capitalize">{medicalHistory.maritalStatus || '-'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600 font-medium">Residential Address</p>
+                      <p className="text-sm font-medium text-gray-900">{medicalHistory.residentialAddress || '-'}</p>
+                    </div>
+
+                    <div className="pt-3 border-t border-gray-100"></div>
+                    <div>
+                      <p className="text-xs text-gray-600 font-medium">Occupation</p>
+                      <p className="text-sm font-medium text-gray-900">{medicalHistory.occupation || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600 font-medium">Employer</p>
+                      <p className="text-sm font-medium text-gray-900">{medicalHistory.employer?.name || '-'}</p>
+                      {medicalHistory.employer?.address && (
+                        <p className="text-xs text-gray-500">{medicalHistory.employer.address}</p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -355,7 +389,23 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                   Medical History
                 </h2>
 
-
+                {/* NEW: Prominent Diagnosis Section */}
+                <div className="mb-6 bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg shadow-sm">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1">Primary Diagnosis</p>
+                      <p className="text-lg font-bold text-gray-900 leading-snug">
+                        {medicalHistory.diagnosis}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-rose-100 flex gap-6">
+                    <div>
+                      <p className="text-xs text-rose-700 font-medium">Referring Physician</p>
+                      <p className="text-sm font-semibold text-gray-900">{medicalHistory.referringPhysician || '-'}</p>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Allergy Details */}
                 {medicalHistory.allergyDetails && (
@@ -391,6 +441,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                     <p><span className="font-medium">Name:</span> {medicalHistory.nextOfKin.name}</p>
                     <p><span className="font-medium">Relationship:</span> {medicalHistory.nextOfKin.relationship}</p>
                     <p><span className="font-medium">Phone:</span> {medicalHistory.nextOfKin.phone}</p>
+                    <p><span className="font-medium">Address:</span> {medicalHistory.nextOfKin.address}</p>
                   </div>
                 </div>
 

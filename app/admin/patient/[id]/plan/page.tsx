@@ -26,7 +26,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
   const [startDate, setStartDate] = useState<string>('')
   const [startTime, setStartTime] = useState<string>('09:00')
   const [treatmentRoom, setTreatmentRoom] = useState<string>('Room 1 (Linear Accelerator)')
-  const [prepInstructions, setPrepInstructions] = useState<string>('Full Bladder')
+  const [prepInstructions, setPrepInstructions] = useState<string>('Full Bladder (drink 500ml water 1 hour before)')
 
   // Nutritional Interventions state
   const [nutritionalInterventions, setNutritionalInterventions] = useState<{
@@ -518,18 +518,35 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Preparation Instructions <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={prepInstructions}
-                  onChange={(e) => setPrepInstructions(e.target.value)}
-                  disabled={isSubmitting}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
-                >
-                  <option value="Full Bladder">Full Bladder (drink 500ml water 1 hour before)</option>
-                  <option value="Empty Bladder">Empty Bladder (void immediately before treatment)</option>
-                  <option value="Fasting">Fasting (no food 4 hours before treatment)</option>
-                  <option value="Standard Prep">Standard Prep (no special requirements)</option>
-                </select>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={prepInstructions}
+                    onChange={(e) => setPrepInstructions(e.target.value)}
+                    disabled={isSubmitting}
+                    required
+                    placeholder="Type instructions or select from below..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Full Bladder (drink 500ml water 1 hour before)",
+                      "Empty Bladder (void immediately before treatment)",
+                      "Fasting (no food 4 hours before treatment)",
+                      "Standard Prep (no special requirements)"
+                    ].map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setPrepInstructions(option)}
+                        disabled={isSubmitting}
+                        className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors border border-gray-200"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">This will be communicated to the patient</p>
               </div>
 
@@ -679,19 +696,35 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Primary Immobilization Device
                 </label>
-                <select
-                  value={immobilizationDevice}
-                  onChange={(e) => setImmobilizationDevice(e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
-                >
-                  <option value="">Select device (optional)</option>
-                  <option value="Thermoplastic mask (3-point or 5-point)">Thermoplastic mask (3-point or 5-point)</option>
-                  <option value="Breast board, wing board, or vacuum bag">Breast board, wing board, or vacuum bag</option>
-                  <option value="Vacuum bag (Vac-Lok), knee and ankle sponges">Vacuum bag (Vac-Lok), knee and ankle sponges</option>
-                  <option value="Customized foam or vacuum cushions">Customized foam or vacuum cushions</option>
-                  <option value="High-precision vacuum bags or SBRT frames">High-precision vacuum bags or SBRT frames</option>
-                </select>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={immobilizationDevice}
+                    onChange={(e) => setImmobilizationDevice(e.target.value)}
+                    disabled={isSubmitting}
+                    placeholder="Type device name or select from below..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Thermoplastic mask (3-point or 5-point)",
+                      "Breast board, wing board, or vacuum bag",
+                      "Vacuum bag (Vac-Lok), knee and ankle sponges",
+                      "Customized foam or vacuum cushions",
+                      "High-precision vacuum bags or SBRT frames"
+                    ].map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setImmobilizationDevice(option)}
+                        disabled={isSubmitting}
+                        className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors border border-gray-200"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Setup Considerations */}
