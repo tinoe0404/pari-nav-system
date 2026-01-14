@@ -74,7 +74,7 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
               Treatment Ready
             </h2>
             <p className="text-base sm:text-xl text-purple-700">
-              Your treatment plan is ready. Please review your boarding pass below.
+              Your treatment plan is ready. Please review your Treatment Plan Schedule below.
             </p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function TreatmentTicket({ plan, patientName }: TreatmentTicketPr
               <p className="text-xs sm:text-sm font-semibold text-purple-200 uppercase tracking-wide mb-1">
                 Parirenyatwa Hospital
               </p>
-              <p className="text-xl sm:text-2xl font-bold leading-tight">Treatment Boarding Pass</p>
+              <p className="text-xl sm:text-2xl font-bold leading-tight">Treatment Plan Schedule</p>
             </div>
             <div className="flex items-center justify-between sm:block sm:text-right border-t border-purple-500/30 sm:border-0 pt-3 sm:pt-0 mt-2 sm:mt-0 w-full sm:w-auto">
               <p className="text-xs sm:text-sm text-purple-200 sm:mb-1">Patient</p>
