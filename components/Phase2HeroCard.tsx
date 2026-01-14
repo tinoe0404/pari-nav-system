@@ -25,7 +25,7 @@ export default function Phase2HeroCard() {
               </h2>
               <div className="flex items-center gap-2 text-blue-100 text-base sm:text-lg">
                 <span className="animate-pulse">●</span>
-                <p>Physics team is calculating your treatment plan.</p>
+                <p>Medical team is calculating your treatment plan.</p>
               </div>
             </div>
             <div className="hidden sm:flex bg-white/20 backdrop-blur-md p-3 rounded-2xl shadow-inner">
@@ -91,7 +91,7 @@ export default function Phase2HeroCard() {
                     <div className="w-2 h-2 bg-white rounded-full"></div>
                   </div>
                 </div>
-                <p className="text-blue-900 font-bold">Physics Calculation</p>
+                <p className="text-blue-900 font-bold">Dose Calculation By The Medical Team</p>
               </div>
 
               {/* Progress Item 3 */}
