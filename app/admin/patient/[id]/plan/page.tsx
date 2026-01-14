@@ -21,6 +21,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
 
   // Form state
   const [treatmentType, setTreatmentType] = useState<'External Beam' | 'Brachytherapy'>('External Beam')
+  const [treatmentIntent, setTreatmentIntent] = useState<string>('Definitive/Curative')
   const [numSessions, setNumSessions] = useState<number>(15)
   const [startDate, setStartDate] = useState<string>('')
   const [startTime, setStartTime] = useState<string>('09:00')
@@ -130,6 +131,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
 
     // Build prescription components
     const prescriptionComponents = {
+      treatmentIntent: treatmentIntent,
       fractionationSchedule: `${numSessions} fractions`,
       technique: treatmentType,
       // Add more auto-populated fields as needed
@@ -283,6 +285,51 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
             </div>
 
             <div className="space-y-5">
+              {/* Treatment Intent */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Treatment Intent <span className="text-red-500">*</span>
+                </label>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentIntent === 'Definitive/Curative'
+                    ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                    }`}>
+                    <input
+                      type="radio"
+                      name="treatmentIntent"
+                      value="Definitive/Curative"
+                      checked={treatmentIntent === 'Definitive/Curative'}
+                      onChange={(e) => setTreatmentIntent(e.target.value)}
+                      className="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500"
+                      disabled={isSubmitting}
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700 block">Definitive/Curative</span>
+                      <span className="text-xs text-gray-500">Radical treatment</span>
+                    </div>
+                  </label>
+                  <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${treatmentIntent === 'Palliative'
+                    ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                    }`}>
+                    <input
+                      type="radio"
+                      name="treatmentIntent"
+                      value="Palliative"
+                      checked={treatmentIntent === 'Palliative'}
+                      onChange={(e) => setTreatmentIntent(e.target.value)}
+                      className="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500"
+                      disabled={isSubmitting}
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700 block">Palliative</span>
+                      <span className="text-xs text-gray-500">Symptom management</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               {/* Treatment Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -683,7 +730,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-slate-50 rounded p-3">
                   <p className="text-xs text-slate-600 mb-1">Treatment Intent</p>
-                  <p className="text-sm font-semibold text-slate-900">Definitive/Curative</p>
+                  <p className="text-sm font-semibold text-slate-900">{treatmentIntent}</p>
                 </div>
                 <div className="bg-slate-50 rounded p-3">
                   <p className="text-xs text-slate-600 mb-1">Energy and Modality</p>
