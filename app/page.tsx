@@ -163,36 +163,50 @@ export default function HomePage() {
         {/* How It Works */}
         <div className="mt-24">
           <h2 className="text-3xl font-bold text-white text-center mb-12">
-            How It Works
+            The Treatment Journey
           </h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-xl">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
                 1
               </div>
-              <h4 className="text-white font-semibold mb-2">Register</h4>
-              <p className="text-blue-200 text-sm">Create your account and receive your MRN</p>
+              <h4 className="text-white font-semibold mb-2 text-lg">Intake & History</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Complete your digital intake form and medical history securely after registration.</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-xl">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
                 2
               </div>
-              <h4 className="text-white font-semibold mb-2">Consultation</h4>
-              <p className="text-blue-200 text-sm">Navigate to your consultant's room</p>
+              <h4 className="text-white font-semibold mb-2 text-lg">Consultation</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Navigate to your consultant's room and confirm completion of your clinical review.</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-xl">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
                 3
               </div>
-              <h4 className="text-white font-semibold mb-2">Scan & Plan</h4>
-              <p className="text-blue-200 text-sm">Get scanned and track planning progress</p>
+              <h4 className="text-white font-semibold mb-2 text-lg">Planning Scan</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Undergo high-precision CT scanning to enable accurate treatment targeting.</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-xl">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
                 4
               </div>
-              <h4 className="text-white font-semibold mb-2">Treatment</h4>
-              <p className="text-blue-200 text-sm">Receive your schedule and begin therapy</p>
+              <h4 className="text-white font-semibold mb-2 text-lg">Physics Planning</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Our clinical physics team calculates your personalized dose distribution.</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                5
+              </div>
+              <h4 className="text-white font-semibold mb-2 text-lg">Active Treatment</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Receive your Treatment Plan Schedule and begin your radiotherapy sessions.</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                6
+              </div>
+              <h4 className="text-white font-semibold mb-2 text-lg">Clinical Reviews</h4>
+              <p className="text-blue-200 text-sm leading-relaxed">Ongoing follow-up care with scheduled reviews to monitor your progress.</p>
             </div>
           </div>
         </div>
