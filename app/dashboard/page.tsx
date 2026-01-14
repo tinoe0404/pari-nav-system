@@ -114,7 +114,7 @@ export default async function PatientDashboard({
     Object.keys(typedPatient.medical_history).length > 0
 
   if (!hasMedicalHistory) {
-    console.log('Blocking redirect: medical_history is empty/null')
+    console.debug('Blocking redirect: medical_history is empty/null')
     redirect('/onboarding')
   }
 
