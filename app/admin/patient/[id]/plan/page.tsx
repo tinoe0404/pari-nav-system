@@ -389,7 +389,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setNumSessions(parseInt(e.target.value) || 1)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-base ${validationErrors.numSessions ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-base ${validationErrors.numSessions ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     style={{ minHeight: '44px' }}
                   />
@@ -436,7 +436,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setStartDate(e.target.value)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                   />
                   {validationErrors.startDate && (
@@ -453,7 +453,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setStartTime(e.target.value)}
                     disabled={isSubmitting}
                     required
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startTime ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 ${validationErrors.startTime ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                   />
                   {validationErrors.startTime && (
@@ -488,7 +488,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                   onChange={(e) => setTreatmentRoom(e.target.value)}
                   disabled={isSubmitting}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                 >
                   <option value="Room 1 (Linear Accelerator)">Room 1 (Linear Accelerator)</option>
                   <option value="Room 2 (Brachytherapy Suite)">Room 2 (Brachytherapy Suite)</option>
@@ -526,7 +526,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     disabled={isSubmitting}
                     required
                     placeholder="Type instructions or select from below..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                   />
                   <div className="flex flex-wrap gap-2">
                     {[
@@ -703,7 +703,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                     onChange={(e) => setImmobilizationDevice(e.target.value)}
                     disabled={isSubmitting}
                     placeholder="Type device name or select from below..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                   />
                   <div className="flex flex-wrap gap-2">
                     {[
@@ -738,7 +738,7 @@ export default function TreatmentPlanningPage({ params }: PageProps) {
                   placeholder="e.g., Shoulder retractors mandatory for 3-point masks; dentures and piercings removed&#10;e.g., Bladder and bowel preparation protocols to manage internal organ motion&#10;e.g., Ensuring comfort to minimize intrafraction movement"
                   disabled={isSubmitting}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-sm resize-none"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100 text-sm resize-none"
                 />
                 <p className="text-xs text-gray-500 mt-1">Describe any special positioning requirements or patient preparation needs</p>
               </div>

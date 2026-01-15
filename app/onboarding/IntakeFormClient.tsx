@@ -159,7 +159,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                 <input
                                     type="text"
                                     disabled
-                                    className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
                                     value="[Auto-filled from profile]"
                                 />
                             </div>
@@ -171,7 +171,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                 <input
                                     type="text"
                                     disabled
-                                    className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
                                     value="[Auto-filled from profile]"
                                 />
                             </div>
@@ -185,7 +185,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nationalId"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="e.g., 63-123456-X-23"
                                 />
                             </div>
@@ -198,7 +198,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="maritalStatus"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
                                 >
                                     <option value="">Select status...</option>
                                     <option value="single">Single</option>
@@ -218,7 +218,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     rows={3}
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                                     placeholder="Enter full physical address..."
                                 />
                             </div>
@@ -249,7 +249,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="occupation"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="e.g., Teacher, Engineer, Unemployed"
                                 />
                             </div>
@@ -263,7 +263,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="employerName"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Company/Organization name"
                                 />
                             </div>
@@ -277,7 +277,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="employerAddress"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Workplace address"
                                 />
                             </div>
@@ -308,7 +308,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinName"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Next of kin's name"
                                 />
                             </div>
@@ -322,7 +322,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinRelationship"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="e.g., Spouse, Mother, Son"
                                 />
                             </div>
@@ -336,7 +336,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="nextOfKinPhone"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="+263 7..."
                                 />
                             </div>
@@ -350,7 +350,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     rows={2}
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                                     placeholder="Next of kin's physical address"
                                 />
                             </div>
@@ -381,7 +381,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="diagnosis"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="e.g., Carcinoma of the Cervix Stage IIB"
                                 />
                             </div>
@@ -395,7 +395,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="referringPhysician"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Doctor who referred you"
                                 />
                             </div>
@@ -441,7 +441,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     rows={3}
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
                                     placeholder="Describe your current symptoms, pain levels, and any other relevant issues..."
                                 />
                             </div>
@@ -454,7 +454,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     name="admissionDate"
                                     required
                                     disabled={isSubmitting}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                 />
                             </div>
                         </div>
@@ -467,7 +467,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                             name="additionalNotes"
                             rows={3}
                             disabled={isSubmitting}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                             placeholder="Any other medical conditions or concerns..."
                         />
                     </div>

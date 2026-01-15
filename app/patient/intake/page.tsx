@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation'
 function IntakeFormContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
-  
+
   const [showAllergyDetails, setShowAllergyDetails] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -76,8 +76,8 @@ function IntakeFormContent() {
             <div>
               <h2 className="text-xl font-bold mb-2">Welcome to Parirenyatwa Radiotherapy</h2>
               <p className="text-blue-100 text-sm leading-relaxed">
-                Before we begin your treatment journey, we need to collect some important medical information. 
-                This helps our team provide you with the safest and most effective care possible. 
+                Before we begin your treatment journey, we need to collect some important medical information.
+                This helps our team provide you with the safest and most effective care possible.
                 All information is confidential and will only be used for your treatment.
               </p>
             </div>
@@ -178,7 +178,7 @@ function IntakeFormContent() {
                   rows={3}
                   disabled={isSubmitting}
                   required={showAllergyDetails}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
                   placeholder="e.g., Penicillin, Iodine contrast dye..."
                 />
               </div>
@@ -218,7 +218,7 @@ function IntakeFormContent() {
                 rows={5}
                 required
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
                 placeholder="e.g., Pain in left hip when walking, difficulty breathing, persistent cough..."
               />
               <p className="mt-2 text-xs text-gray-500">
@@ -318,7 +318,7 @@ function IntakeFormContent() {
                   name="nextOfKinName"
                   required
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                   placeholder="e.g., John Moyo"
                 />
               </div>
@@ -332,7 +332,7 @@ function IntakeFormContent() {
                   name="nextOfKinRelationship"
                   required
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                   placeholder="e.g., Spouse, Sibling, Parent"
                 />
               </div>
@@ -346,7 +346,7 @@ function IntakeFormContent() {
                   name="nextOfKinPhone"
                   required
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none disabled:bg-gray-100"
                   placeholder="e.g., +263 77 123 4567"
                 />
               </div>
@@ -381,7 +381,7 @@ function IntakeFormContent() {
               name="additionalNotes"
               rows={4}
               disabled={isSubmitting}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none disabled:bg-gray-100"
               placeholder="Any other medical conditions, concerns, or special requirements..."
             />
           </div>
@@ -402,8 +402,8 @@ function IntakeFormContent() {
                   Consent & Acknowledgment
                 </h4>
                 <p className="text-sm text-blue-800 leading-relaxed">
-                  I confirm that the information provided above is accurate and complete to the best of my knowledge. 
-                  I understand that this information will be used to plan my treatment and ensure my safety. 
+                  I confirm that the information provided above is accurate and complete to the best of my knowledge.
+                  I understand that this information will be used to plan my treatment and ensure my safety.
                   I consent to receive radiotherapy treatment at Parirenyatwa Hospital.
                 </p>
               </div>

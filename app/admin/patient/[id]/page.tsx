@@ -590,7 +590,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                       name="notes"
                       rows={3}
                       placeholder="Any specific comments on patient setup or issues..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
                     />
                   </div>
 
@@ -925,7 +925,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                             name="notes"
                             rows={3}
                             placeholder="Add any observations or notes from this review..."
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none resize-none mb-3"
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none resize-none mb-3"
                           />
                           <button
                             type="submit"
@@ -979,7 +979,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                       name="outcomeNotes"
                       rows={3}
                       placeholder="Add any final notes about the successful outcome..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none resize-none mb-4"
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none resize-none mb-4"
                     />
                     <button
                       type="submit"
@@ -1014,7 +1014,7 @@ export default async function AdminPatientDetailPage({ params, searchParams }: P
                       rows={4}
                       required
                       placeholder="Explain why the treatment needs to be restarted (e.g., tumor progression, treatment ineffective, etc.)..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all outline-none resize-none mb-4"
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all outline-none resize-none mb-4"
                     />
                     <button
                       type="submit"
