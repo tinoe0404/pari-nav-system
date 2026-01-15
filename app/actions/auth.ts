@@ -4,15 +4,25 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { loginSchema, signupSchema } from '@/lib/validations/auth'
 
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
-  const data = {
+  // Validate input data
+  const rawData = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   }
+
+  const validation = loginSchema.safeParse(rawData)
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]
+    redirect(`/login?error=${encodeURIComponent(firstError.message)}`)
+  }
+
+  const data = validation.data
 
   const { data: authData, error } = await supabase.auth.signInWithPassword(data)
 
@@ -55,10 +65,19 @@ export async function login(formData: FormData) {
 export async function loginAdmin(formData: FormData) {
   const supabase = await createClient()
 
-  const data = {
+  // Validate input data
+  const rawData = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   }
+
+  const validation = loginSchema.safeParse(rawData)
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]
+    redirect(`/admin/login?error=${encodeURIComponent(firstError.message)}`)
+  }
+
+  const data = validation.data
 
 
 
@@ -129,10 +148,21 @@ export async function loginAdmin(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient()
 
-  const fullName = formData.get('full_name') as string
-  const dob = formData.get('dob') as string
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  // Validate input data
+  const rawData = {
+    full_name: formData.get('full_name') as string,
+    dob: formData.get('dob') as string,
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const validation = signupSchema.safeParse(rawData)
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]
+    redirect(`/register?error=${encodeURIComponent(firstError.message)}`)
+  }
+
+  const { full_name: fullName, dob, email, password } = validation.data
 
 
 
