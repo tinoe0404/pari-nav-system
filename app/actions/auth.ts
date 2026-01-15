@@ -60,8 +60,7 @@ export async function loginAdmin(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  console.log('=== ADMIN LOGIN DEBUG ===')
-  console.log('Attempting admin login for:', data.email)
+
 
   try {
     // Try to sign in
@@ -80,7 +79,7 @@ export async function loginAdmin(formData: FormData) {
       redirect('/admin/login?error=No+user+returned')
     }
 
-    console.log('User authenticated:', authData.user.id)
+
 
     // Use service role to check profile (bypasses RLS completely)
     const supabaseAdmin = await createClient()
@@ -105,15 +104,15 @@ export async function loginAdmin(formData: FormData) {
         redirect(`/admin/login?error=${encodeURIComponent('Profile lookup failed: ' + profileError.message)}`)
       }
 
-      console.log('Profile found:', profile)
+
 
       if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) {
-        console.log('User role check failed. Role:', profile?.role)
+
         await supabase.auth.signOut()
         redirect('/admin/login?error=Unauthorized%3A+Admin+access+required')
       }
 
-      console.log('Admin access granted!')
+
       revalidatePath('/', 'layout')
       redirect('/admin/dashboard')
     } else {
@@ -135,8 +134,7 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  console.log('=== SIGNUP DEBUG START ===')
-  console.log('Attempting signup for:', email)
+
 
   // Step 1: Create auth user
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -160,13 +158,13 @@ export async function signup(formData: FormData) {
     redirect(`/register?error=${encodeURIComponent('Signup failed - no user created')}`)
   }
 
-  console.log('Auth user created:', authData.user.id)
+
 
   // Step 2: Wait a moment for the database trigger to create the profile
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   // Step 3: Generate MRN with retry logic for duplicates
-  console.log('Generating MRN...')
+
 
   // Use service role key to bypass RLS for patient creation
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -186,7 +184,7 @@ export async function signup(formData: FormData) {
   const maxRetries = 5
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    console.log(`MRN generation attempt ${attempt}/${maxRetries}...`)
+
 
     const { data: generatedMrn, error: genError } = await adminClient.rpc('generate_mrn')
 
@@ -206,10 +204,10 @@ export async function signup(formData: FormData) {
     if (!existingPatient) {
       // MRN is available, use it
       mrnData = generatedMrn
-      console.log('MRN generated successfully:', mrnData)
+
       break
     } else {
-      console.log(`MRN ${generatedMrn} already exists, retrying...`)
+
       // Wait a bit before retrying
       await new Promise(resolve => setTimeout(resolve, 200))
     }
@@ -221,7 +219,7 @@ export async function signup(formData: FormData) {
   }
 
   // Step 4: Create patient record using service role to bypass RLS
-  console.log('Creating patient record with MRN:', mrnData)
+
 
   const { data: patientData, error: patientError } = await adminClient
     .from('patients')
@@ -256,8 +254,7 @@ export async function signup(formData: FormData) {
     }
   }
 
-  console.log('Patient record created:', patientData)
-  console.log('=== SIGNUP DEBUG END ===')
+
 
   revalidatePath('/', 'layout')
   redirect('/dashboard')

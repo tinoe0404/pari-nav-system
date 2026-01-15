@@ -436,11 +436,11 @@ export async function publishTreatmentPlan(
       emailNotification.emailError = 'Patient email address not found in system'
     } else {
       try {
-        console.log(`📧 Sending plan ready email to ${patient.email}...`)
+
         emailNotification = await sendPlanReadyEmail(patient.email, patient.full_name)
 
         if (emailNotification.emailSent) {
-          console.log(`✅ Email successfully sent to ${patient.email}`)
+
         } else {
           console.error(`❌ Failed to send email to ${patient.email}:`, emailNotification.emailError)
         }
@@ -620,8 +620,9 @@ export async function completeTreatment(
       // We don't await this to ensure the UI updates instantly
       sendTreatmentCompletionEmail(patient.email, patient.full_name)
         .then((result: EmailNotificationResult) => {
-          if (result.emailSent) console.log(`✅ Completion email sent to ${patient.email}`)
-          else console.error(`❌ Failed to send completion email: ${result.emailError}`)
+          if (!result.emailSent) {
+            console.error(`❌ Failed to send completion email: ${result.emailError}`)
+          }
         })
         .catch((err: unknown) => console.error('❌ Unexpected email error:', err))
     } else {

@@ -56,8 +56,9 @@ export async function markTreatmentComplete(patientId: string): Promise<ActionRe
         if (patient && patient.email) {
             sendTreatmentCompletionEmail(patient.email, patient.full_name)
                 .then(result => {
-                    if (result.emailSent) console.log(`✅ Treatment completion email sent to ${patient.email}`)
-                    else console.error(`❌ Failed to send treatment completion email: ${result.emailError}`)
+                    if (!result.emailSent) {
+                        console.error(`❌ Failed to send treatment completion email: ${result.emailError}`)
+                    }
                 })
                 .catch(err => console.error('❌ Unexpected email error:', err))
         }
@@ -247,9 +248,7 @@ export async function schedulePostTreatmentReviews(
                     reviewsForEmail
                 )
 
-                if (emailNotification.emailSent) {
-                    console.log(`✅ Review schedule email sent to ${patient.email}`)
-                } else {
+                if (!emailNotification.emailSent) {
                     console.error(`❌ Failed to send review schedule email:`, emailNotification.emailError)
                 }
             } catch (emailError) {
@@ -386,8 +385,9 @@ export async function markReviewComplete(
             // Need to import sendReviewCompletionEmail at the top
             sendReviewCompletionEmail(patient.email, patient.full_name, review.review_number, notes)
                 .then(result => {
-                    if (result.emailSent) console.log(`✅ Completion email sent for review ${review.review_number}`)
-                    else console.error(`❌ Failed to send review completion email: ${result.emailError}`)
+                    if (!result.emailSent) {
+                        console.error(`❌ Failed to send review completion email: ${result.emailError}`)
+                    }
                 })
                 .catch(err => console.error('❌ Unexpected email error:', err))
         }
@@ -498,8 +498,9 @@ export async function finalizeTreatmentSuccess(
         if (patient.email) {
             sendTreatmentSuccessEmail(patient.email, patient.full_name)
                 .then((result: EmailNotificationResult) => {
-                    if (result.emailSent) console.log(`✅ Success email sent to ${patient.email}`)
-                    else console.error(`❌ Failed to send success email: ${result.emailError}`)
+                    if (!result.emailSent) {
+                        console.error(`❌ Failed to send success email: ${result.emailError}`)
+                    }
                 })
                 .catch((err: unknown) => console.error('❌ Unexpected email error:', err))
         } else {
@@ -617,8 +618,9 @@ export async function restartTreatment(
         if (patient.email) {
             sendTreatmentRestartEmail(patient.email, patient.full_name, reason)
                 .then((result: EmailNotificationResult) => {
-                    if (result.emailSent) console.log(`✅ Restart email sent to ${patient.email}`)
-                    else console.error(`❌ Failed to send restart email: ${result.emailError}`)
+                    if (!result.emailSent) {
+                        console.error(`❌ Failed to send restart email: ${result.emailError}`)
+                    }
                 })
                 .catch((err: unknown) => console.error('❌ Unexpected email error:', err))
         } else {
