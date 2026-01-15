@@ -173,7 +173,7 @@ Parirenyatwa Radiotherapy Center
       html: htmlBody,
     })
 
-    console.log('✅ Review schedule email sent:', info.messageId)
+    console.debug('✅ Review schedule email sent:', info.messageId)
     return { emailSent: true }
 
   } catch (error) {
@@ -296,7 +296,7 @@ Parirenyatwa Radiotherapy Center
       html: htmlBody,
     })
 
-    console.log(`✅ Review ${reviewNumber} completion email sent:`, info.messageId)
+    console.debug(`✅ Review ${reviewNumber} completion email sent:`, info.messageId)
     return { emailSent: true }
 
   } catch (error) {
@@ -442,7 +442,7 @@ Wishing you a healthy future! 🌈
       html: htmlBody,
     })
 
-    console.log('✅ Treatment success email sent:', info.messageId)
+    console.debug('✅ Treatment success email sent:', info.messageId)
     return { emailSent: true }
 
   } catch (error) {
@@ -592,7 +592,7 @@ Harare, Zimbabwe
       html: htmlBody,
     })
 
-    console.log('✅ Treatment restart email sent:', info.messageId)
+    console.debug('✅ Treatment restart email sent:', info.messageId)
     return { emailSent: true }
 
   } catch (error) {

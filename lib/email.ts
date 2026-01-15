@@ -93,7 +93,7 @@ export async function sendPlanReadyEmail(
     baseUrl = baseUrl.replace(/\/$/, '')
     const dashboardUrl = `${baseUrl}/dashboard`
 
-    console.log('🔗 Generated Plan URL:', dashboardUrl)
+    console.debug('🔗 Generated Plan URL:', dashboardUrl)
 
     // Email content
     const subject = 'Update: Radiotherapy Plan Ready'
@@ -198,7 +198,7 @@ Please do not reply to this email.
       html: htmlBody,
     })
 
-    console.log('✅ Email sent successfully:', info.messageId)
+    console.debug('✅ Email sent successfully:', info.messageId)
 
     return {
       emailSent: true,
@@ -263,7 +263,7 @@ export async function sendTreatmentCompletionEmail(
 
     const dashboardUrl = `${baseUrl}/dashboard`
 
-    console.log('🔗 Generated Dashboard URL:', dashboardUrl)
+    console.debug('🔗 Generated Dashboard URL:', dashboardUrl)
 
     const htmlBody = `
 <!DOCTYPE html>
@@ -328,7 +328,7 @@ Parirenyatwa Radiotherapy Center
       html: htmlBody,
     })
 
-    console.log('✅ Completion email sent:', info.messageId)
+    console.debug('✅ Completion email sent:', info.messageId)
     return { emailSent: true }
 
   } catch (error) {

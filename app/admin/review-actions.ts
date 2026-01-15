@@ -13,6 +13,7 @@ import {
 import { sendTreatmentCompletionEmail } from '@/lib/email'
 import type { EmailNotificationResult } from '@/lib/email'
 import type { ActionResponse, ScheduleReviewsInput } from './actions'
+import { scheduleReviewsSchema } from '@/lib/validations/admin'
 
 // ============================================
 // MARK TREATMENT COMPLETE (NEW STEP 1)
@@ -93,60 +94,17 @@ export async function schedulePostTreatmentReviews(
 ): Promise<ActionResponse<{ reviewIds: string[]; emailNotification: EmailNotificationResult }>> {
     try {
         const admin = await requireAdmin()
-        const { patientId, treatmentPlanId, reviews } = input
 
-        // Validation
-        if (!patientId?.trim()) {
-            return { success: false, error: 'Patient ID is required' }
+        // Validate Input
+        const validation = scheduleReviewsSchema.safeParse(input)
+        if (!validation.success) {
+            return { success: false, error: validation.error.issues[0].message }
         }
 
-        if (!treatmentPlanId?.trim()) {
-            return { success: false, error: 'Treatment Plan ID is required' }
-        }
+        const { patientId, treatmentPlanId, reviews } = validation.data
 
-        if (!reviews || reviews.length !== 3) {
-            return { success: false, error: 'Exactly 3 review appointments must be scheduled' }
-        }
-
-        // Validate review numbers are sequential (1, 2, 3)
-        const reviewNumbers = reviews.map(r => r.reviewNumber).sort()
-        if (reviewNumbers[0] !== 1 || reviewNumbers[1] !== 2 || reviewNumbers[2] !== 3) {
-            return { success: false, error: 'Review numbers must be 1, 2, and 3' }
-        }
-
-        // Validate all dates and locations
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        for (const review of reviews) {
-            if (!review.reviewDate) {
-                return { success: false, error: `Review ${review.reviewNumber} date is required` }
-            }
-
-            if (!review.officeLocation?.trim()) {
-                return { success: false, error: `Review ${review.reviewNumber} office location is required` }
-            }
-
-            const reviewDate = new Date(review.reviewDate)
-            if (isNaN(reviewDate.getTime())) {
-                return { success: false, error: `Review ${review.reviewNumber} has invalid date format` }
-            }
-
-            reviewDate.setHours(0, 0, 0, 0)
-            if (reviewDate < today) {
-                return { success: false, error: `Review ${review.reviewNumber} date cannot be in the past` }
-            }
-        }
-
-        // Validate dates are in order (date1 < date2 < date3)
+        // Note: Date sequential validation is already handled by Zod refine
         const sortedReviews = [...reviews].sort((a, b) => a.reviewNumber - b.reviewNumber)
-        const date1 = new Date(sortedReviews[0].reviewDate)
-        const date2 = new Date(sortedReviews[1].reviewDate)
-        const date3 = new Date(sortedReviews[2].reviewDate)
-
-        if (date1 >= date2 || date2 >= date3) {
-            return { success: false, error: 'Review dates must be in chronological order (Review 1 < Review 2 < Review 3)' }
-        }
 
         const supabase = await createClient()
 

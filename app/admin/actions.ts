@@ -9,90 +9,20 @@ import {
   sendTreatmentCompletionEmail,
   type EmailNotificationResult
 } from '@/lib/email'
-import {
-  sendReviewScheduleEmail,
-  sendTreatmentSuccessEmail,
-  sendTreatmentRestartEmail
-} from '@/lib/email-reviews'
+import { scanLogSchema, treatmentPlanSchema, scheduleReviewsSchema } from '@/lib/validations/admin'
+import type { ScanLogInput, TreatmentPlanInput, ScheduleReviewsInput } from '@/lib/validations/admin'
 
-// ============================================
-// TYPE DEFINITIONS
-// ============================================
-
-export interface ScanLogInput {
-  patientId: string
-  machineRoom: string
-  notes: string
-  scanDetails?: {
-    position: string
-    immobilization: string[]
-    bladderProtocol: string
-    metalImplants: boolean
-    headshell: boolean
-  }
-}
-
-export interface TreatmentPlanInput {
-  patientId: string
-  treatmentType: string
-  numSessions: number
-  startDate: string
-  prepInstructions?: string
-
-  // Nutritional Interventions
-  nutritionalInterventions?: {
-    "Difficulty Swallowing"?: string
-    "Nausea"?: string
-    "Diarrhea"?: string
-    "Dry Mouth"?: string
-    "Dehydration"?: string
-  }
-
-  // Skin Care Management
-  skinCareDos?: string[]
-  skinCareDonts?: string[]
-
-  // Immobilization Device & Setup
-  immobilizationDevice?: string
-  setupConsiderations?: string
-
-  // Essential Prescription Components
-  prescriptionComponents?: {
-    patientDemographics?: string
-    primaryDiagnosis?: string
-    treatmentIntent?: string
-    anatomicalTarget?: string
-    energyModality?: string
-    absorbedDose?: string
-    fractionationSchedule?: string
-    volumeDefinitions?: string
-    technique?: string
-    imageGuidance?: string
-  }
-
-  // Legacy field for backward compatibility
-  legacySideEffects?: string[]
-}
+export type { ScheduleReviewsInput } // Re-export for review-actions.ts
 
 export interface ActionResponse<T = void> {
   success: boolean
   data?: T
   error?: string
-  warning?: string  // For non-critical issues like email failures
-}
-
-export interface ScheduleReviewsInput {
-  patientId: string
-  treatmentPlanId: string
-  reviews: Array<{
-    reviewNumber: 1 | 2 | 3
-    reviewDate: string
-    officeLocation: string
-  }>
+  warning?: string
 }
 
 // ============================================
-// 1. LOG PATIENT SCAN (UNCHANGED)
+// 1. LOG PATIENT SCAN (VALIDATED)
 // ============================================
 
 export async function logPatientScan(
@@ -102,19 +32,16 @@ export async function logPatientScan(
     // Verify admin access
     const admin = await requireAdmin()
 
-    const { patientId, machineRoom, notes, scanDetails } = input
-
-    // Enhanced validation with specific error messages
-    if (!patientId?.trim()) {
-      return { success: false, error: 'Patient ID is required' }
+    // Validate Input
+    const validation = scanLogSchema.safeParse(input)
+    if (!validation.success) {
+      return { success: false, error: validation.error.issues[0].message }
     }
 
-    if (!machineRoom?.trim()) {
-      return { success: false, error: 'Machine room identifier is required' }
-    }
+    const { patientId, machineRoom, notes, scanDetails } = validation.data
 
     // Construct formatted notes if details are provided
-    let finalNotes = notes?.trim() || ''
+    let finalNotes = notes.trim()
 
     if (scanDetails) {
       const formattedDetails = `
@@ -127,13 +54,6 @@ export async function logPatientScan(
 `.trim()
 
       finalNotes = finalNotes ? `${finalNotes}\n\n${formattedDetails}` : formattedDetails
-    }
-
-    if (!finalNotes || finalNotes.length < 5) {
-      return {
-        success: false,
-        error: 'Scan notes are required.'
-      }
     }
 
     const supabase = await createClient()
@@ -249,6 +169,12 @@ export async function publishTreatmentPlan(
     // Verify admin access
     const admin = await requireAdmin()
 
+    // Validate Input
+    const validation = treatmentPlanSchema.safeParse(input)
+    if (!validation.success) {
+      return { success: false, error: validation.error.issues[0].message }
+    }
+
     const {
       patientId,
       treatmentType,
@@ -262,55 +188,7 @@ export async function publishTreatmentPlan(
       setupConsiderations,
       prescriptionComponents,
       legacySideEffects,
-    } = input
-
-    // Enhanced validation
-    if (!patientId?.trim()) {
-      return { success: false, error: 'Patient ID is required' }
-    }
-
-    if (!treatmentType?.trim()) {
-      return { success: false, error: 'Treatment type must be specified' }
-    }
-
-    if (!numSessions || numSessions < 1) {
-      return { success: false, error: 'At least 1 treatment session is required' }
-    }
-
-    if (numSessions > 50) {
-      return { success: false, error: 'Number of sessions exceeds maximum of 50' }
-    }
-
-    if (!startDate) {
-      return { success: false, error: 'Treatment start date is required' }
-    }
-
-    // Validate date format and future date
-    const startDateObj = new Date(startDate)
-    if (isNaN(startDateObj.getTime())) {
-      return { success: false, error: 'Invalid start date format' }
-    }
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    startDateObj.setHours(0, 0, 0, 0)
-
-    if (startDateObj < today) {
-      return {
-        success: false,
-        error: 'Treatment cannot be scheduled in the past. Please select a current or future date.',
-      }
-    }
-
-    // Check if date is more than 6 months in future (safety check)
-    const sixMonthsFromNow = new Date()
-    sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
-    if (startDateObj > sixMonthsFromNow) {
-      return {
-        success: false,
-        error: 'Treatment date is more than 6 months away. Please verify the date is correct.',
-      }
-    }
+    } = validation.data
 
     const supabase = await createClient()
 
