@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { publishTreatmentPlan } from '@/app/admin/actions'
-import type { TreatmentPlanInput } from '@/app/admin/actions'
+import type { TreatmentPlanInput } from '@/lib/validations/admin'
 import { Loader2 } from 'lucide-react'
 
 interface PageProps {
