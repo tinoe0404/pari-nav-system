@@ -12,8 +12,9 @@ import {
 } from '@/lib/email-reviews'
 import { sendTreatmentCompletionEmail } from '@/lib/email'
 import type { EmailNotificationResult } from '@/lib/email'
-import type { ActionResponse, ScheduleReviewsInput } from './actions'
+import type { ActionResponse } from './actions'
 import { scheduleReviewsSchema } from '@/lib/validations/admin'
+import type { ScheduleReviewsInput } from '@/lib/validations/admin'
 
 // ============================================
 // MARK TREATMENT COMPLETE (NEW STEP 1)

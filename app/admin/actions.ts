@@ -12,7 +12,7 @@ import {
 import { scanLogSchema, treatmentPlanSchema, scheduleReviewsSchema } from '@/lib/validations/admin'
 import type { ScanLogInput, TreatmentPlanInput, ScheduleReviewsInput } from '@/lib/validations/admin'
 
-export type { ScheduleReviewsInput } // Re-export for review-actions.ts
+
 
 export interface ActionResponse<T = void> {
   success: boolean
