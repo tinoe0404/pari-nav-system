@@ -6,7 +6,7 @@ import { z } from 'zod'
  */
 export const intakeFormSchema = z.object({
     // Demographics
-    maritalStatus: z.enum(['Single', 'Married', 'Divorced', 'Widowed'], {
+    maritalStatus: z.enum(['single', 'married', 'divorced', 'widowed', 'other'], {
         message: 'Please select a valid marital status',
     }),
     nationalId: z
@@ -52,12 +52,12 @@ export const intakeFormSchema = z.object({
         .string()
         .max(2000, 'Symptoms description is too long')
         .trim(),
-    mobilityStatus: z.enum(['Independent', 'Assisted', 'Wheelchair'], {
+    mobilityStatus: z.enum(['walking', 'assistance_needed', 'wheelchair', 'stretcher'], {
         message: 'Please select a valid mobility status',
     }),
     admissionDate: z
         .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+        .regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?.*$/, 'Date must be in YYYY-MM-DD or YYYY-MM-DDThh:mm format'),
 
     // Next of Kin
     nextOfKinName: z
