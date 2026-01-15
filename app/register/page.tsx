@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { signup } from '@/app/actions/auth'
+import { Loader2 } from 'lucide-react'
 
 function RegisterFormContent() {
   const searchParams = useSearchParams()
@@ -251,9 +252,17 @@ function RegisterFormContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+              aria-busy={isSubmitting}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {isSubmitting ? 'Creating Account...' : 'Create Account'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
             </button>
           </form>
 

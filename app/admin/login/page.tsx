@@ -1,15 +1,25 @@
 // app/admin/login/page.tsx (CORRECT ADMIN LOGIN)
+'use client'
+
 import Link from 'next/link'
 import { loginAdmin } from '@/app/actions/auth'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
-export default async function AdminLoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string; redirect?: string }>
-}) {
-  const params = await searchParams
-  const error = params.error
-  const redirect = params.redirect
+function AdminLoginFormContent() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const redirect = searchParams.get('redirect')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    await loginAdmin(formData)
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(180deg, #dce3ed 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
@@ -91,7 +101,7 @@ export default async function AdminLoginPage({
             </div>
           )}
 
-          <form action={loginAdmin} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Hidden redirect field */}
             {redirect && (
               <input type="hidden" name="redirect" value={redirect} />
@@ -150,9 +160,18 @@ export default async function AdminLoginPage({
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Sign In
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
@@ -196,5 +215,13 @@ export default async function AdminLoginPage({
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AdminLoginFormContent />
+    </Suspense>
   )
 }

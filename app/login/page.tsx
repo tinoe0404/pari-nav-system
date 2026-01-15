@@ -1,14 +1,27 @@
 // app/login/page.tsx (FIXED)
+'use client'
+
 import Link from 'next/link'
 import { login } from '@/app/actions/auth'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>
-}) {
-  const params = await searchParams
-  const error = params.error
+function LoginFormContent() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    await login(formData)
+
+    // Keep loading state if redirecting, otherwise reset on error
+    // The component will unmount on success, so no need to setIsSubmitting(false)
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 50%, #f8fafc 100%)', minHeight: '100vh' }}>
@@ -66,7 +79,7 @@ export default async function LoginPage({
             </div>
           )}
 
-          <form action={login} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
               <label
@@ -126,9 +139,18 @@ export default async function LoginPage({
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Sign In
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
@@ -164,5 +186,13 @@ export default async function LoginPage({
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginFormContent />
+    </Suspense>
   )
 }
