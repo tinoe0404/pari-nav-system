@@ -47,12 +47,7 @@ export const signupSchema = z.object({
             const d = new Date(date)
             return d instanceof Date && !isNaN(d.getTime())
         }, 'Invalid date')
-        .refine((date) => {
-            const birthDate = new Date(date)
-            const today = new Date()
-            const age = today.getFullYear() - birthDate.getFullYear()
-            return age >= 18 && age <= 120
-        }, 'Patient must be between 18 and 120 years old'),
+
 })
 
 /**

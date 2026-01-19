@@ -383,7 +383,7 @@ export default function IntakeFormClient({ error }: IntakeFormClientProps) {
                                     required
                                     disabled={isSubmitting}
                                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                    placeholder="e.g., Carcinoma of the Cervix Stage IIB"
+                                    placeholder=""
                                 />
                             </div>
 
