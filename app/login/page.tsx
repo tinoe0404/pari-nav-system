@@ -11,16 +11,23 @@ function LoginFormContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [clientError, setClientError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsSubmitting(true)
+    setClientError(null)
 
     const formData = new FormData(e.currentTarget)
-    await login(formData)
-
-    // Keep loading state if redirecting, otherwise reset on error
-    // The component will unmount on success, so no need to setIsSubmitting(false)
+    
+    try {
+      await login(formData)
+    } catch (err) {
+      // Only runs if the server action throws an error that isn't a redirect
+      console.error('Login error:', err)
+      setClientError('An unexpected error occurred. Please try again.')
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -56,7 +63,8 @@ function LoginFormContent() {
           </h2>
 
           {/* Error Message */}
-          {error && (
+          {/* Error Message */}
+          {(error || clientError) && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex gap-3">
                 <svg
@@ -73,7 +81,7 @@ function LoginFormContent() {
                   />
                 </svg>
                 <p className="text-sm text-red-800">
-                  {decodeURIComponent(error)}
+                  {error ? decodeURIComponent(error) : clientError}
                 </p>
               </div>
             </div>

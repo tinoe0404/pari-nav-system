@@ -12,9 +12,11 @@ function RegisterFormContent() {
   const error = searchParams.get('error')
   const [passwordMatch, setPasswordMatch] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [clientError, setClientError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setClientError(null)
 
     const formData = new FormData(e.currentTarget)
     const password = formData.get('password') as string
@@ -31,7 +33,8 @@ function RegisterFormContent() {
     try {
       await signup(formData)
     } catch (error) {
-      // Error is handled by redirect in signup function
+      console.error('Registration error:', error)
+      setClientError('An unexpected error occurred. Please try again.')
       setIsSubmitting(false)
     }
   }
@@ -69,7 +72,8 @@ function RegisterFormContent() {
           </h2>
 
           {/* Error Message */}
-          {error && (
+          {/* Error Message */}
+          {(error || clientError) && (
             <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-4">
               <div className="flex gap-3">
                 <svg
@@ -88,7 +92,7 @@ function RegisterFormContent() {
                 <div>
                   <p className="text-sm font-semibold text-red-900 mb-1">Registration Failed</p>
                   <p className="text-sm text-red-800">
-                    {decodeURIComponent(error)}
+                    {error ? decodeURIComponent(error) : clientError}
                   </p>
                 </div>
               </div>
